@@ -114,7 +114,8 @@ class DigitalProducts_LicenseElementType extends BaseElementType
             'product' => ['label' => Craft::t('Licensed product')],
             'productType' => ['label' => Craft::t('Product type')],
             'dateCreated' => ['label' => Craft::t('License issue date')],
-            'licensedTo' => ['label' => Craft::t('Licensed to')]
+            'licensedTo' => ['label' => Craft::t('Licensed to')],
+            'orderLink' => ['label' => Craft::t('Associated order')]
         ];
 
         // Allow plugins to modify the attributes
@@ -144,6 +145,8 @@ class DigitalProducts_LicenseElementType extends BaseElementType
         $attributes[] = 'product';
         $attributes[] = 'dateCreated';
         $attributes[] = 'licensedTo';
+        $attributes[] = 'orderLink';
+
 
         return $attributes;
     }
@@ -178,6 +181,11 @@ class DigitalProducts_LicenseElementType extends BaseElementType
 
             case 'licensedTo': {
                 return $element->getLicensedTo();
+            }
+
+            case 'orderLink': {
+                $url = $element->getOrderEditUrl();
+                return $url ? '<a href="' . $url . '">' . Craft::t('View order') . '</a>' : '';
             }
 
             default: {
@@ -261,7 +269,7 @@ class DigitalProducts_LicenseElementType extends BaseElementType
     public function modifyElementsQuery(DbCommand $query, ElementCriteriaModel $criteria)
     {
         $query
-            ->addSelect("licenses.id, licenses.productId, licenses.licenseKey, licenses.licenseeName, licenses.licenseeEmail, licenses.userId, products.typeId as productTypeId")
+            ->addSelect("licenses.id, licenses.productId, licenses.licenseKey, licenses.licenseeName, licenses.licenseeEmail, licenses.userId, licenses.orderId, products.typeId as productTypeId")
             ->join('digitalproducts_licenses licenses', 'licenses.id = elements.id')
             ->join('digitalproducts_products products', 'products.id = licenses.productId')
             ->leftJoin('users users', 'users.id = licenses.userId')

@@ -99,6 +99,19 @@ class DigitalProducts_LicenseModel extends BaseElementModel
     }
 
     /**
+     * @return string
+     */
+    public function getOrderEditUrl()
+    {
+        if ($this->orderId)
+        {
+            return UrlHelper::getCpUrl('commerce/orders/' . $this->orderId);
+        }
+        
+        return "";
+    }
+    
+    /**
      * @return array
      */
     protected function defineAttributes()
