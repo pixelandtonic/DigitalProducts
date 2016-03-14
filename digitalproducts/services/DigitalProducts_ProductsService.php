@@ -22,6 +22,25 @@ class DigitalProducts_ProductsService extends BaseApplicationComponent
         return craft()->elements->getElementById($id, 'DigitalProducts_Product', $localeId);
     }
 
+    /**
+     * Get products by criteria
+     *
+     * @param array|ElementCriteriaModel $criteria
+     *
+     * @return DigitalProducts_ProductModel[]
+     */
+    public function getProducts($criteria = [])
+    {
+
+        if (!$criteria instanceof ElementCriteriaModel)
+        {
+            $criteria = craft()->elements->getCriteria('DigitalProducts_Product', $criteria);
+        }
+
+        return $criteria->find();
+    }
+
+
 
     /**
      * @param DigitalProducts_ProductModel $product
