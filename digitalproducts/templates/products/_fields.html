@@ -1,0 +1,95 @@
+{% macro titleField(product) %}
+	{%- import "_includes/forms" as forms -%}
+
+	{{ forms.textField({
+		label: "Title"|t,
+		locale: product.locale,
+		id: 'title',
+		name: 'title',
+		value: product.title,
+		placeholder: 'Enter title'|t,
+		errors: product.getErrors('title'),
+		first: true,
+		autofocus: true,
+		required: true,
+		maxlength: 255
+	}) }}
+{% endmacro %}
+
+
+{% macro generalMetaFields(product) %}
+	{%- import "_includes/forms" as forms -%}
+
+	{{ forms.textField({
+		label: "Slug"|t,
+		locale: product.locale,
+		id: 'slug',
+		name: 'slug',
+		value: product.slug,
+		placeholder: 'Enter slug'|t,
+		errors: product.getErrors('slug')|merge(product.getErrors('uri'))
+	}) }}
+
+	{{ forms.dateTimeField({
+		label: 'Post Date'|t,
+		id: 'postDate',
+		name: 'postDate',
+		value: product.postDate,
+		errors: product.getErrors('postDate')
+	}) }}
+
+	{{ forms.dateTimeField({
+		label: 'Expiry Date'|t,
+		id: 'expiryDate',
+		name: 'expiryDate',
+		value: product.expiryDate,
+		errors: product.getErrors('expiryDate')
+	}) }}
+{% endmacro %}
+
+
+{% macro behavioralMetaFields(product) %}
+	{%- import "_includes/forms" as forms -%}
+
+	{{ forms.selectField({
+		label: 'Tax Category'|t,
+		name: 'taxCategoryId',
+		value: product.taxCategoryId,
+		required: true,
+		options: craft.commerce.getTaxCategories()
+	}) }}
+
+	{{ forms.checkboxField({
+		id: 'promotable',
+		fieldLabel: 'Promotable'|t,
+		name: 'promotable',
+		checked: product.promotable,
+	}) }}
+{% endmacro %}
+
+
+{% macro generalFields(product) %}
+	{%- import "_includes/forms" as forms -%}
+
+	{{ forms.textField({
+		id: 'sku',
+		label: 'SKU'|t,
+		required: true,
+		name: 'sku',
+		value: product.sku,
+		instructions: 'If left empty the format "{skuFormat}" will be used.'|t({skuFormat: product.getProductType().skuFormat}),
+		placeholder: 'Enter SKU'|t,
+		errors: product.getErrors('sku')
+	}) }}
+
+	{{ forms.textField({
+		id: 'price',
+		label: 'Price'|t,
+		name: 'price',
+		value: (product.price == '0' ? '0'|number : (product.price ?  product.price|number ?: '')),
+		placeholder: 'Enter price'|t,
+		unit: craft.commerce.settings.defaultCurrency,
+		required: true,
+		errors: product.getErrors('price')
+	}) }}
+{% endmacro %}

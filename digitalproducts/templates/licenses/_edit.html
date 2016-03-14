@@ -1,0 +1,79 @@
+{% extends "_layouts/cp" %}
+{% hook 'digitalProducts.prepCpTemplate' %}
+{% set selectedSubnavItem = "licenses" %}
+
+{% set fullPageForm = true %}
+
+{% import "_includes/forms" as forms %}
+
+{% set statusOptions = [{label: 'Active'|t, value: 1}, {label: 'Disabled'|t, value: 0}] %}
+
+{% block content %}
+	<input type="hidden" name="action" value="digitalProducts/licenses/save">
+	<input type="hidden" name="redirect" value="digitalproducts/licenses">
+	{% if license.id %}<input type="hidden" name="licenseId" value="{{ license.id }}">{% endif %}
+
+	<div id="license-fields">
+		{{ forms.elementSelectField({
+			elementType: productElementType,
+			elements: license.productId ? craft.digitalProducts.products.id(license.productId).find() : null,
+			label: "The digital product"|t,
+			id: 'product',
+			class: 'ltr',
+			name: 'product',
+			limit: 1
+		}) }}
+
+
+		{{ forms.textAreaField({
+			label: "License key"|t,
+			instructions: "The license key is generated automatically",
+			id: 'licenseKey',
+			class: 'code',
+			name: 'licenseKey',
+			disabled: true,
+			value: license.licenseKey,
+		}) }}
+
+		{{ forms.selectField({
+			label: "Status"|t,
+			id: 'status',
+			class: 'ltr',
+			name: 'enabled',
+			value: license.enabled,
+			options: statusOptions,
+			errors: license.getErrors('skuFormat')
+		}) }}
+
+		{{ forms.textField({
+			label: "Licensee's Name"|t,
+			id: 'licenseeName',
+			class: 'ltr',
+			name: 'licenseeName',
+			value: license.licenseeName,
+			errors: license.getErrors('licenseeName'),
+			required: true
+		}) }}
+
+		{{ forms.textField({
+			label: "Licensee's Email"|t,
+			id: 'licenseeEmail',
+			class: 'ltr',
+			name: 'licenseeEmail',
+			value: license.licenseeEmail,
+			errors: license.getErrors('licenseeEmail'),
+			required: true
+		}) }}
+
+		{{ forms.elementSelectField({
+			elementType: userElementType,
+			elements: license.userId ? craft.users.id(license.userId).find() : null,
+			label: "Licensee"|t,
+			id: 'licensee',
+			class: 'ltr',
+			name: 'licensee',
+			limit: 1
+		}) }}
+	</div>
+
+{% endblock %}

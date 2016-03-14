@@ -1,0 +1,194 @@
+{% extends "_layouts/cp" %}
+{% hook 'digitalProducts.prepCpTemplate' %}
+{% set selectedSubnavItem = "productTypes" %}
+
+{% set tabs = {
+	productTypeSettings: { label: "Settings"|t, url: '#product-type-settings' },
+	productFields:       { label: "Product fields"|t, url: '#product-fields' },
+} %}
+
+{% set fullPageForm = true %}
+
+{% set selectedTab = 'settings' %}
+{% import "_includes/forms" as forms %}
+
+{% block content %}
+	<input type="hidden" name="action" value="digitalProducts/productTypes/save">
+	<input type="hidden" name="redirect" value="digitalproducts/producttypes">
+	{% if productType.id %}<input type="hidden" name="productTypeId" value="{{ productType.id }}">{% endif %}
+
+	<div id="product-type-settings">
+		{{ forms.textField({
+			first: true,
+			label: "Name"|t,
+			instructions: "What this product type will be called in the CP."|t,
+			id: 'name',
+			name: 'name',
+			value: productType.name,
+			errors: productType.getErrors('name'),
+			autofocus: true,
+			required: true,
+			translatable: true
+		}) }}
+
+		{{ forms.textField({
+			label: "Handle"|t,
+			instructions: "How you’ll refer to this product type in the templates."|t,
+			id: 'handle',
+			class: 'code',
+			name: 'handle',
+			value: productType.handle,
+			errors: productType.getErrors('handle'),
+			required: true
+		}) }}
+
+		{{ forms.textField({
+			label: "Automatic SKU Format"|t,
+			instructions: "What the unique auto-generated SKUs should look like, when a SKU field is submitted without a value. You can include tags that output properties, such as {ex1} or {ex2}"|t({ ex1: '<code>{slug}</code>', ex2: '<code>{myCustomField}</code>' }),
+			id: 'skuFormat',
+			class: 'ltr',
+			name: 'skuFormat',
+			value: productType.skuFormat,
+			errors: productType.getErrors('skuFormat')
+		}) }}
+
+		{{ forms.textField({
+			label: "License key alphabet"|t,
+			instructions: "What characters should the license key use."|t,
+			id: 'licenseKeyAlphabet',
+			class: 'ltr',
+			name: 'licenseKeyAlphabet',
+			value: productType.licenseKeyAlphabet ? productType.licenseKeyAlphabet : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+			errors: productType.getErrors('licenseKeyAlphabet'),
+			required: true,
+		}) }}
+
+		{{ forms.textField({
+			label: "License key length"|t,
+			instructions: "Length of the generated license key."|t,
+			id: 'licenseKeyLength',
+			class: 'ltr',
+			name: 'licenseKeyLength',
+			value: productType.licenseKeyLength ? productType.licenseKeyLength : 128,
+			errors: productType.getErrors('licenseKeyLength')
+		}) }}
+
+		{% macro hasUrlsField(productType) %}
+			{% from "_includes/forms" import checkboxField %}
+
+			{{ checkboxField({
+				label: "Products of this type have their own URLs"|t,
+				id: 'hasUrls',
+				name: 'hasUrls',
+				checked: productType.hasUrls,
+				toggle: 'url-settings'
+			}) }}
+		{% endmacro %}
+
+		{% macro templateField(productType) %}
+			{% from "_includes/forms" import textField %}
+
+			{{ textField({
+				label: "Product Template"|t,
+				instructions: "The template to use when a product’s URL is requested."|t,
+				id: 'template',
+				class: 'ltr',
+				name: 'template',
+				value: productType.template,
+				errors: productType.getErrors('template')
+			}) }}
+		{% endmacro %}
+
+		{% from _self import hasUrlsField, templateField %}
+
+		{{ hasUrlsField(productType) }}
+
+
+		<div id="url-settings" class="nested-fields{% if not productType.hasUrls %} hidden{% endif %}">
+
+			{% macro urlFormatText(locale, productType, name, value) %}
+				{% from "_includes/forms" import text, errorList %}
+				{% set errors = productType.getErrors(name~'-'~locale.id) %}
+
+				<div class="input{% if errors %} errors{% endif %}">
+					{{ text({
+						id: name~'-'~locale.id,
+						class: 'code ltr',
+						name: name~'['~locale.id~']',
+						value: (value != '__home__' ? value : null),
+						errors: errors
+					}) }}
+				</div>
+
+				{{ errorList(errors) }}
+			{% endmacro %}
+
+			{% set urlFormatInput %}
+				<table class="data fullwidth">
+					<thead>
+					{% if craft.isLocalized() %}
+						<th></th>
+					{% endif %}
+					<th scope="col">{{ "Product Type"|t }}</th>
+					</thead>
+					<tbody>
+					{% for locale in craft.i18n.getSiteLocales() %}
+						<tr>
+							{% if craft.isLocalized() %}
+								<th class="thin nowrap">{{ locale.id }}</th>
+							{% endif %}
+							<td class="topalign">
+								{% set value = (productType.locales[locale.id] is defined ? productType.locales[locale.id].urlFormat : null) %}
+								{{ _self.urlFormatText(locale, productType, 'urlFormat', value) }}
+							</td>
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			{% endset %}
+
+			{{ forms.field({
+				label: "Product URL Format"|t,
+				instructions: "What the product URLs should look like. You can include tags that output product properties, such as such as {ex1} or {ex2}."|t({ ex1: '<code>{slug}</code>', ex2: '<code>{publishDate|date(\"Y\")}</code>' }),
+			}, urlFormatInput) }}
+
+			{{ forms.textField({
+				label: "Product Template"|t,
+				instructions: "The template to use when a product’s URL is requested."|t,
+				id: 'template',
+				class: 'ltr',
+				name: 'template',
+				value: productType.template,
+				errors: productType.getErrors('template')
+			}) }}
+		</div>
+
+	</div>
+
+	<div id="product-fields" class="hidden">
+
+		{% include "_includes/fieldlayoutdesigner" with {
+			fieldLayout: productType.asa('productFieldLayout').getFieldLayout(),
+		} only %}
+
+	</div>
+
+{% endblock %}
+
+{% includejs %}
+    {% if not productType.handle %}new Craft.HandleGenerator('#name', '#handle');{% endif %}
+
+    {% for locale in craft.i18n.getSiteLocales() %}
+		{% if productType.locales[locale.id] is not defined or not productType.locales[locale.id].urlFormat %}
+			new Craft.EntryUrlFormatGenerator('#name', '#urlFormat-{{ locale.id }}', { suffix: '/{slug}' });
+		{% endif %}
+	{% endfor %}
+$('#hasVariants').on('change', function() {
+if ($(this).prop('checked')) {
+$('#tab-variantFields').removeClass('hidden');
+} else {
+$('#tab-variantFields').addClass('hidden');
+}
+});
+
+{% endincludejs %}

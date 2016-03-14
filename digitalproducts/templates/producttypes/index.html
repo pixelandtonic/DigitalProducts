@@ -1,0 +1,47 @@
+{% extends "_layouts/cp" %}
+{% hook 'digitalProducts.prepCpTemplate' %}
+
+{% set title = "Product Types"|t %}
+{% set selectedSubnavItem = "productTypes" %}
+
+{% set productTypes = craft.digitalProducts.getAllProductTypes() %}
+{% set content %}
+	<div id="noProductTypes"{% if productTypes %} class="hidden"{% endif %}>
+		<p>{{ "No product types exist yet."|t }}</p>
+	</div>
+
+	{% if productTypes|length %}
+		<table id="productTypes" class="data fullwidth collapsible">
+			<thead>
+			<th scope="col">{{ "Name"|t }}</th>
+			<th scope="col">{{ "Handle"|t }}</th>
+			<td class="thin"></td>
+			</thead>
+			<tbody>
+			{% for productType in productTypes %}
+				<tr data-id="{{ productType.id }}" data-name="{{ productType.name|t }}">
+					<th scope="row" data-title="{{ 'Name'|t }}"><a href="{{ url('digitalproducts/producttypes/' ~ productType.id) }}">{{ productType.name|t }}</a></th>
+					<td data-title="{{ 'Handle'|t }}"><code>{{ productType.handle }}</code></td>
+					<td class="thin"><a class="delete icon" title="{{ 'Delete'|t }}" role="button"></a></td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	{% endif %}
+
+	<div id="newProductType" class="buttons">
+		<a href="{{ url('digitalproducts/producttypes/new') }}" class="btn submit add icon">{{ "New Product Type"|t }}</a>
+	</div>
+{% endset %}
+
+
+{% set js %}
+	var adminTable = new Craft.AdminTable({
+	tableSelector: '#productTypes',
+	noObjectsSelector: '#noProductTypes',
+	newObjectBtnSelector: '#newProductType',
+	deleteAction: 'digitalProducts/productTypes/delete',
+	confirmDeleteMessage: '{{ "Are you sure you want to delete “{name}” and all its products?"|t }}'
+	});
+{% endset %}
+{% includeJs js %}

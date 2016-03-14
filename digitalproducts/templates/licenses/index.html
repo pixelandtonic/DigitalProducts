@@ -1,0 +1,16 @@
+{% extends "_layouts/elementindex" %}
+{% hook 'digitalProducts.prepCpTemplate' %}
+
+{% if not currentUser.can('commerce-manageOrders') %}
+	{% exit 404 %}
+{% endif %}
+
+{% set title = "Licenses"|t %}
+{% set selectedSubnavItem = "licenses" %}
+
+{% set docTitle = title~' - '~'Digital Products' %}
+{% set elementType = 'DigitalProducts_License' %}
+
+{% block content %}
+	{{ parent() }}
+{% endblock %}

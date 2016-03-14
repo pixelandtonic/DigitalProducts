@@ -1,0 +1,193 @@
+<?php
+namespace Craft;
+
+/**
+ * Licenses service.
+ *
+ * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
+ * @copyright Copyright (c) 2016, Pixel & Tonic, Inc.
+ */
+class DigitalProducts_LicensesService extends BaseApplicationComponent
+{
+    /**
+     * Get a digital product by it's ID.
+     *
+     * @param int $id
+     *
+     * @return DigitalProducts_ProductModel
+     */
+    public function getLicenseById($id)
+    {
+        return craft()->elements->getElementById($id);
+    }
+
+    /**
+     * Get licenses
+     *
+     * @param array|\CDbCriteria $criteria
+     *
+     * @return DigitalProducts_ProductTypeModel[]
+     */
+    public function getLicenses($criteria = [])
+    {
+        $results = DigitalProducts_LicenseRecord::model()->findAll($criteria);
+
+        return DigitalProducts_LicenseModel::populateModels($results);
+    }
+    
+    /**
+     * @param DigitalProducts_LicenseModel $license
+     *
+     * @return bool
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function saveLicense(DigitalProducts_LicenseModel $license)
+    {
+        if (!$license->id) {
+            $record = new DigitalProducts_LicenseRecord();
+        } else {
+            $record = DigitalProducts_LicenseRecord::model()->findById($license->id);
+
+            if (!$record) {
+                throw new Exception(Craft::t('No license exists with the ID “{id}”',
+                    ['id' => $license->id]));
+            }
+        }
+
+        /**
+         * @var $product DigitalProducts_ProductModel
+         */
+        $product = craft()->digitalProducts_products->getProductById($license->productId);
+
+        if (!$product) {
+            throw new Exception(Craft::t('No product exists with the ID “{id}”',
+                ['id' => $license->productId]));
+        }
+
+        $productType = $product->getProductType();
+
+        if (!$productType) {
+            throw new Exception(Craft::t('No product type exists with the ID “{id}”',
+                ['id' => $product->typeId]));
+        }
+
+        if (!$record->id)
+        {
+            $record->licenseKey = DigitalProductsHelper::generateLicenseKey($productType->licenseKeyAlphabet, $productType->licenseKeyLength);
+        }
+
+        $record->enabled = $license->enabled;
+        $record->licenseeName = $license->licenseeName;
+        $record->licenseeEmail = $license->licenseeEmail;
+        $record->userId = $license->userId;
+        $record->productId = $license->productId;
+        $record->orderId = $license->orderId;
+
+        $record->validate();
+        $license->addErrors($record->getErrors());
+
+        if ($license->hasErrors()) {
+            return false;
+        }
+
+        $transaction = craft()->db->getCurrentTransaction() === null ? craft()->db->beginTransaction() : null;
+
+        try {
+            $success = craft()->elements->saveElement($license, false);
+
+            if (!$success) {
+                if ($transaction !== null) {
+                    $transaction->rollback();
+                }
+
+                return false;
+            }
+
+            $record->id = $license->id;
+            $record->save(false);
+
+            if ($transaction !== null) {
+                $transaction->commit();
+            }
+        } catch (\Exception $e) {
+            if ($transaction !== null) {
+                $transaction->rollback();
+            }
+
+            throw $e;
+        }
+
+        return true;
+    }
+
+    /**
+     * Sort trough the ordered items and generate licenses for digital products.
+     *
+     * @param Event $event
+     */
+    public static function handleCompletedOrder(Event $event)
+    {
+
+        if (empty($event->params['order']))
+        {
+            return;
+        }
+
+        /**
+         * @var Commerce_OrderModel $order
+         */
+        $order = $event->params['order'];
+        $lineItems = $order->getLineItems();
+
+        /**
+         * @var Commerce_LineItemModel $lineItem
+         */
+        foreach ($lineItems as $lineItem)
+        {
+            $itemId = $lineItem->purchasableId;
+            $element = craft()->elements->getElementById($itemId);
+
+            if ($element->getElementType() == "DigitalProducts_Product")
+            {
+                /**
+                 * @var DigitalProducts_ProductModel $element
+                 */
+                craft()->digitalProducts_licenses->licenseProductByOrder($element, $order);
+            }
+        }
+    }
+
+    /**
+     * Generate a license for a Product per Order.
+     *
+     * @param DigitalProducts_ProductModel $product
+     * @param Commerce_OrderModel          $order
+     *
+     * @return bool
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function licenseProductByOrder(DigitalProducts_ProductModel $product, Commerce_OrderModel $order)
+    {
+        $license = new DigitalProducts_LicenseModel();
+        $license->productId = $product->id;
+        $customer = $order->getCustomer();
+
+        if ($customer && $user = $customer->getUser())
+        {
+            $license->licenseeEmail = $user->email;
+            $license->licenseeName = $user->getName();
+            $license->userId = $user->id;
+        }
+        else
+        {
+            $license->licenseeEmail = $customer->email;
+        }
+        
+        $license->enabled = 1;
+        $license->orderId = $order->id;
+
+        return $this->saveLicense($license);
+    }
+}

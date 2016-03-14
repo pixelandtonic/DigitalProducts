@@ -1,0 +1,182 @@
+<?php
+
+namespace Craft;
+
+
+/**
+ * Digital Products Plugin for Craft Commerce.
+ *
+ * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
+ * @copyright Copyright (c) 2016, Pixel & Tonic, Inc.
+ */
+class DigitalProductsPlugin extends BasePlugin
+{
+    public $handle = 'digitalProducts';
+
+    /**
+     * Initialize the plugin.
+     */
+    public function init()
+    {
+        if (craft()->request->isCpRequest()) {
+            craft()->templates->hook('digitalProducts.prepCpTemplate', array($this, 'prepCpTemplate'));
+            $this->_includeCpResources();
+        }
+
+        $this->_registerEventHandlers();
+    }
+
+    /**
+     * The plugin name.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'Digital Products';
+    }
+
+    /**
+     * The plugin description.
+     *
+     * @return string|null
+     */
+    public function getDescription()
+    {
+        return 'Add digital products to Craft Commerce.';
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return string
+     */
+    public function getDeveloper()
+    {
+        return 'Pixel & Tonic';
+    }
+
+    /**
+     * Commerce Developer URL.
+     *
+     * @return string
+     */
+    public function getDeveloperUrl()
+    {
+        return 'https://craftcommerce.com';
+    }
+
+    /**
+     * Commerce Documentation URL.
+     *
+     * @return string
+     */
+    public function getDocumentationUrl()
+    {
+        return;
+    }
+
+    /**
+     * Digital Products has a control panel section.
+     *
+     * @return bool
+     */
+    public function hasCpSection()
+    {
+        return true;
+    }
+
+    /**
+     * Make sure requirements are met before installation.
+     *
+     * @return bool
+     * @throws Exception
+     */
+    public function onBeforeInstall()
+    {
+    }
+
+    /**
+     * Commerce Version.
+     *
+     * @return string
+     */
+    public function getVersion()
+    {
+        return '0.1';
+    }
+
+    /**
+     * Commerce Schema Version.
+     *
+     * @return string|null
+     */
+    public function getSchemaVersion()
+    {
+        return '0.0.1';
+    }
+
+    /**
+     * Control Panel routes.
+     *
+     * @return mixed
+     */
+    public function registerCpRoutes()
+    {
+        return [
+            'digitalproducts/producttypes/new' => ['action' => 'digitalProducts/productTypes/edit'],
+            'digitalproducts/producttypes/(?P<productTypeId>\d+)' => ['action' => 'digitalProducts/productTypes/edit'],
+            'digitalproducts/products/(?P<productTypeHandle>{handle})' => ['action' => 'digitalProducts/products/index'],
+            'digitalproducts/products/(?P<productTypeHandle>{handle})/new' => ['action' => 'digitalProducts/products/edit'],
+            'digitalproducts/products/(?P<productTypeHandle>{handle})/new/(?P<localeId>\w+)' => ['action' => 'digitalProducts/products/edit'],
+            'digitalproducts/products/(?P<productTypeHandle>{handle})/(?P<productId>\d+)' => ['action' => 'digitalProducts/products/edit'],
+            'digitalproducts/products/(?P<productTypeHandle>{handle})/(?P<productId>\d+)/(?P<localeId>\w+)' => ['action' => 'digitalProducts/products/edit'],
+
+            'digitalproducts/licenses/new' => ['action' => 'digitalProducts/licenses/edit'],
+            'digitalproducts/licenses/(?P<licenseId>\d+)' => ['action' => 'digitalProducts/licenses/edit'],
+        ];
+    }
+
+    /**
+     * Prepares a CP template.
+     *
+     * @param array &$context The current template context
+     */
+    public function prepCpTemplate(&$context)
+    {
+        $context['subnav'] = array();
+
+        if (craft()->userSession->checkPermission('commerce-manageProducts')) {
+            $context['subnav']['productTypes'] = array('label' => Craft::t('Product types'), 'url' => 'digitalproducts/producttypes');
+            $context['subnav']['products'] = array('label' => Craft::t('Products'), 'url' => 'digitalproducts/products');
+        }
+
+        if (craft()->userSession->checkPermission('commerce-manageOrders')) {
+            $context['subnav']['licenses'] = array('label' => Craft::t('Licenses'), 'url' => 'digitalproducts/licenses');
+        }
+
+    }
+
+    /**
+     * Get Settings URL
+     */
+    public function getSettingsUrl()
+    {
+        return false;
+    }
+
+    /**
+     * Includes front end resources for Control Panel requests.
+     */
+    private function _includeCpResources()
+    {
+        craft()->templates->includeJsResource('digitalproducts/js/DigitalProducts.js');
+        craft()->templates->includeJsResource('digitalproducts/js/DigitalProductsLicenseIndex.js');
+        craft()->templates->includeJsResource('digitalproducts/js/DigitalProductsProductIndex.js');
+    }
+
+    private function _registerEventHandlers()
+    {
+        craft()->on('commerce_orders.onOrderComplete', ['\Craft\DigitalProducts_LicensesService', 'handleCompletedOrder']);
+    }
+}
