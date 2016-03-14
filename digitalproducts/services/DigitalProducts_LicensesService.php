@@ -22,17 +22,21 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
     }
 
     /**
-     * Get licenses
+     * Get licenses by criteria
      *
-     * @param array|\CDbCriteria $criteria
+     * @param array|ElementCriteriaModel $criteria
      *
-     * @return DigitalProducts_ProductTypeModel[]
+     * @return DigitalProducts_LicenseModel[]
      */
     public function getLicenses($criteria = [])
     {
-        $results = DigitalProducts_LicenseRecord::model()->findAll($criteria);
 
-        return DigitalProducts_LicenseModel::populateModels($results);
+        if (!$criteria instanceof ElementCriteriaModel)
+        {
+            $criteria = craft()->elements->getCriteria('DigitalProducts_License', $criteria);
+        }
+
+        return $criteria->find();
     }
     
     /**
@@ -147,13 +151,46 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         {
             $itemId = $lineItem->purchasableId;
             $element = craft()->elements->getElementById($itemId);
+            $quantity = $lineItem->qty;
 
             if ($element->getElementType() == "DigitalProducts_Product")
             {
                 /**
                  * @var DigitalProducts_ProductModel $element
                  */
-                craft()->digitalProducts_licenses->licenseProductByOrder($element, $order);
+                for ($i = 0; $i < $quantity; $i++)
+                {
+                    craft()->digitalProducts_licenses->licenseProductByOrder($element, $order);
+                }
+            }
+        }
+    }
+
+    public static function handleUserActivation(Event $event)
+    {
+        if (empty($event->params['user']))
+        {
+            return;
+        }
+
+        /**
+         * @var UserModel $user
+         */
+        $user = $event->params['user'];
+        $email = $user->email;
+
+        $licenses = craft()->digitalProducts_licenses->getLicenses(array('licenseeEmail' => $email));
+
+        /**
+         * @var DigitalProducts_LicenseModel $license
+         */
+        foreach ($licenses as $license)
+        {
+            // Only licenses with unassigned users
+            if (!$license->userId)
+            {
+                $license->userId = $user->id;
+                craft()->digitalProducts_licenses->saveLicense($license);
             }
         }
     }

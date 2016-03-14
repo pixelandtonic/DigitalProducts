@@ -178,5 +178,6 @@ class DigitalProductsPlugin extends BasePlugin
     private function _registerEventHandlers()
     {
         craft()->on('commerce_orders.onOrderComplete', ['\Craft\DigitalProducts_LicensesService', 'handleCompletedOrder']);
+        craft()->on('users.onActivateUser', ['\Craft\DigitalProducts_LicensesService', 'handleUserActivation']);
     }
 }
