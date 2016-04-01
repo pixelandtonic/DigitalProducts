@@ -27,19 +27,23 @@ class DigitalProducts_LicensesController extends BaseController
      */
     public function actionEdit(array $variables = [])
     {
-        if (empty($variables['licenseId'])) {
-            $license = new DigitalProducts_LicenseModel();
-        } else {
-            $license = craft()->digitalProducts_licenses->getLicenseById($variables['licenseId']);
-            
-            if (!$license)
-            {
-                $license = new DigitalProducts_LicenseModel();;
+        if (empty($variables['license']))
+        {
+            if (empty($variables['licenseId'])) {
+                $license = new DigitalProducts_LicenseModel();
+            } else {
+                $license = craft()->digitalProducts_licenses->getLicenseById($variables['licenseId']);
+
+                if (!$license)
+                {
+                    $license = new DigitalProducts_LicenseModel();;
+                }
             }
+            
+            $variables['license'] = $license;
         }
 
         $variables['title'] = empty($license->id) ? Craft::t("Create a new License") : (string) $license;
-        $variables['license'] = $license;
 
         $variables['userElementType'] = craft()->elements->getElementType(ElementType::User);
         $variables['productElementType'] = craft()->elements->getElementType("DigitalProducts_Product");
@@ -65,6 +69,7 @@ class DigitalProducts_LicensesController extends BaseController
         {
             $license->productId = reset($productIds);
         }
+        
 
         $userIds = craft()->request->getPost('licensee');
         if (is_array($userIds) && !empty($userIds))

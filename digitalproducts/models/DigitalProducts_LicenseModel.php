@@ -107,10 +107,25 @@ class DigitalProducts_LicenseModel extends BaseElementModel
         {
             return UrlHelper::getCpUrl('commerce/orders/' . $this->orderId);
         }
-        
+
         return "";
     }
-    
+
+
+    /**
+     * Sets some eager loaded elements on a given handle.
+     *
+     * @param string             $handle   The handle to load the elements with in the future
+     * @param BaseElementModel[] $elements The eager-loaded elements
+     */
+    public function setEagerLoadedElements($handle, $elements)
+    {
+        if ($handle == 'product') {
+            $this->_product = reset($elements);
+        } else {
+            parent::setEagerLoadedElements($handle, $elements);
+        }
+    }
     /**
      * @return array
      */

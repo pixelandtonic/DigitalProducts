@@ -19,6 +19,7 @@
 			elements: license.productId ? craft.digitalProducts.products.id(license.productId).find() : null,
 			label: "The digital product"|t,
 			id: 'product',
+			errors: license.getErrors('productId'),
 			class: 'ltr',
 			name: 'product',
 			limit: 1
@@ -27,7 +28,7 @@
 
 		{{ forms.textAreaField({
 			label: "License key"|t,
-			instructions: "The license key is generated automatically",
+			instructions: "The license key is generated automatically"|t,
 			id: 'licenseKey',
 			class: 'code',
 			name: 'licenseKey',
@@ -62,7 +63,8 @@
 			name: 'licenseeEmail',
 			value: license.licenseeEmail,
 			errors: license.getErrors('licenseeEmail'),
-			required: true
+			required: true,
+			instructions: "Required, if Licensee field is blank."|t,
 		}) }}
 
 		{{ forms.elementSelectField({
@@ -72,7 +74,10 @@
 			id: 'licensee',
 			class: 'ltr',
 			name: 'licensee',
-			limit: 1
+			limit: 1,
+			errors: license.getErrors('userId'),
+			required: true,
+			instructions: "Required, if Licensee's Email field is blank."|t
 		}) }}
 	</div>
 

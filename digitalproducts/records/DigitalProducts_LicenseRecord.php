@@ -31,7 +31,7 @@ class DigitalProducts_LicenseRecord extends BaseRecord
     public function defineIndexes()
     {
         return [
-            ['columns' => ['licenseKey', 'productId'], 'unique' => true],
+            ['columns' => ['licenseKey'], 'unique' => true],
         ];
     }
 
@@ -51,6 +51,7 @@ class DigitalProducts_LicenseRecord extends BaseRecord
             'product' => [
                 static::BELONGS_TO,
                 'DigitalProducts_ProductRecord',
+                'required' => true,
                 'onDelete' => static::CASCADE
             ]
         ];
@@ -64,7 +65,7 @@ class DigitalProducts_LicenseRecord extends BaseRecord
         return [
             'licenseKey' => [AttributeType::String, 'required' => true],
             'licenseeName' => AttributeType::String,
-            'licenseeEmail' => [AttributeType::String, 'required' => true],
+            'licenseeEmail' => [AttributeType::String],
             'enabled' => AttributeType::Bool,
             'userId' => AttributeType::Number,
             'orderId' => AttributeType::Number,

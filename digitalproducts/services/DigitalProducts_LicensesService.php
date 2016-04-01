@@ -59,6 +59,31 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
             }
         }
 
+        $record->enabled = $license->enabled;
+        $record->licenseeName = $license->licenseeName;
+        $record->licenseeEmail = $license->licenseeEmail;
+        
+
+        if (empty($license->productId))
+        {
+            $license->addError('productId', Craft::t('{attribute} cannot be blank.', array('attribute' => 'Product')));
+        }
+
+        if (empty($license->userId) && empty($license->licenseeEmail))
+        {
+            $license->addError('userId', Craft::t('A license must have either an email or a licensee assigned to it.'));
+            $license->addError('licenseeEmail', Craft::t('A license must have either an email or a licensee assigned to it.'));
+        }
+
+        // See if we already have issues with provided data.
+        if ($license->hasErrors()) {
+            return false;
+        }
+
+        $record->userId = $license->userId;
+        $record->productId = $license->productId;
+        $record->orderId = $license->orderId;
+
         /**
          * @var $product DigitalProducts_ProductModel
          */
@@ -78,15 +103,10 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
 
         if (!$record->id)
         {
+            // TODO should we check if this will not clash with the index?
             $record->licenseKey = DigitalProductsHelper::generateLicenseKey($productType->licenseKeyAlphabet, $productType->licenseKeyLength);
         }
 
-        $record->enabled = $license->enabled;
-        $record->licenseeName = $license->licenseeName;
-        $record->licenseeEmail = $license->licenseeEmail;
-        $record->userId = $license->userId;
-        $record->productId = $license->productId;
-        $record->orderId = $license->orderId;
 
         $record->validate();
         $license->addErrors($record->getErrors());
