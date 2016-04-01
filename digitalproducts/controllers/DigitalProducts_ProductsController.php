@@ -12,7 +12,9 @@ class DigitalProducts_ProductsController extends BaseController
     // TODO permissions
 
     /**
-     * @throws HttpException
+     * Always check if user is allowed to do commerce-y stuff.
+     *
+     * @throws HttpException if lacking permissions.
      */
     public function init()
     {
@@ -35,7 +37,7 @@ class DigitalProducts_ProductsController extends BaseController
      *
      * @param array $variables
      *
-     * @throws HttpException
+     * @throws HttpException bubbles from DigitalProducts_ProductsController::_prepProductVariables()
      */
     public function actionEdit(array $variables = [])
     {
@@ -44,11 +46,11 @@ class DigitalProducts_ProductsController extends BaseController
         if (!empty($variables['product']->id)) {
             $variables['title'] = $variables['product']->title;
         } else {
-            $variables['title'] = Craft::t('Create a new product') . ' - ' . $variables['productType']->name;
+            $variables['title'] = Craft::t('Create a new product').' - '.$variables['productType']->name;
         }
 
-        $variables['continueEditingUrl'] = "digitalproducts/products/".$variables['productType']->handle."/{id}" .
-            (craft()->isLocalized() && !empty($variables['localeId']) && craft()->getLanguage() != $variables['localeId'] ? '/' . $variables['localeId'] : '');
+        $variables['continueEditingUrl'] = "digitalproducts/products/".$variables['productType']->handle."/{id}".
+            (craft()->isLocalized() && !empty($variables['localeId']) && craft()->getLanguage() != $variables['localeId'] ? '/'.$variables['localeId'] : '');
 
         $this->_prepVariables($variables);
 
@@ -57,17 +59,17 @@ class DigitalProducts_ProductsController extends BaseController
 
     /**
      * Prepare product variables from POSt data.
+     *
      * @param $variables
      *
-     * @throws HttpException
+     * @throws HttpException in case of missing data or lacking permissions.
      */
 
     private function _prepProductVariables(&$variables)
     {
         $variables['localeIds'] = craft()->i18n->getEditableLocaleIds();
 
-        if (!$variables['localeIds'])
-        {
+        if (!$variables['localeIds']) {
             throw new HttpException(403, Craft::t('Your account doesn’t have permission to edit any of this site’s locales.'));
         }
 
@@ -102,6 +104,7 @@ class DigitalProducts_ProductsController extends BaseController
             } else {
                 $variables['product'] = new DigitalProducts_ProductModel();
                 $variables['product']->typeId = $variables['productType']->id;
+                
                 if (!empty($variables['localeId'])) {
                     $variables['product']->locale = $variables['localeId'];
                 }
@@ -142,7 +145,7 @@ class DigitalProducts_ProductsController extends BaseController
 
             $variables['tabs'][] = [
                 'label' => Craft::t($tab->name),
-                'url' => '#tab' . ($index + 1),
+                'url' => '#tab'.($index + 1),
                 'class' => ($hasErrors ? 'error' : null)
             ];
         }
@@ -241,7 +244,7 @@ class DigitalProducts_ProductsController extends BaseController
             $product->enabled = $data['enabled'];
         }
 
-        $product->price = (float) $data['price'];
+        $product->price = (float)$data['price'];
         $product->sku = $data['sku'];
 
         $product->postDate = $data['postDate'] ? \Craft\DateTime::createFromString($data['postDate'], \Craft\craft()->timezone) : $product->postDate;
@@ -254,7 +257,7 @@ class DigitalProducts_ProductsController extends BaseController
         $product->taxCategoryId = $data['taxCategoryId'] ? $data['taxCategoryId'] : $product->taxCategoryId;
         $product->slug = $data['slug'] ? $data['slug'] : $product->slug;
 
-        $product->localeEnabled = (bool) craft()->request->getPost('localeEnabled', $product->localeEnabled);
+        $product->localeEnabled = (bool)craft()->request->getPost('localeEnabled', $product->localeEnabled);
         $product->getContent()->title = craft()->request->getPost('title', $product->title);
         $product->setContentFromPost('fields');
 

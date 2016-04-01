@@ -218,6 +218,7 @@ class DigitalProducts_ProductElementType extends BaseElementType
             'title' => Craft::t('Title'),
             'postDate' => Craft::t('Post Date'),
             'expiryDate' => Craft::t('Expiry Date'),
+            'price' => Craft::t('Price'),
         ];
 
         // Allow plugins to modify the attributes
