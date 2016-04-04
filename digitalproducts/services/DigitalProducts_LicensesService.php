@@ -75,6 +75,13 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
             $license->addError('licenseeEmail', Craft::t('A license must have either an email or a licensee assigned to it.'));
         }
 
+        if (
+            (!craft()->config->exists('assignUserOnPurchase', 'digitalProducts') || craft()->config->get('assignUserOnPurchase', 'digitalProducts'))
+            && empty($license->userId) && !empty($license->licenseeEmail) && $user = craft()->users->getUserByEmail($license->licenseeEmail))
+        {
+            $license->userId = $user->id;
+        }
+
         // See if we already have issues with provided data.
         if ($license->hasErrors()) {
             return false;
