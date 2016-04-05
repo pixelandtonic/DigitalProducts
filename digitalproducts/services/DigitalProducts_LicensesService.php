@@ -30,15 +30,13 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
      */
     public function getLicenses($criteria = [])
     {
-
-        if (!$criteria instanceof ElementCriteriaModel)
-        {
+        if (!$criteria instanceof ElementCriteriaModel) {
             $criteria = craft()->elements->getCriteria('DigitalProducts_License', $criteria);
         }
 
         return $criteria->find();
     }
-    
+
     /**
      * @param DigitalProducts_LicenseModel $license
      *
@@ -62,23 +60,20 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         $record->enabled = $license->enabled;
         $record->licenseeName = $license->licenseeName;
         $record->licenseeEmail = $license->licenseeEmail;
-        
 
-        if (empty($license->productId))
-        {
-            $license->addError('productId', Craft::t('{attribute} cannot be blank.', array('attribute' => 'Product')));
+        if (empty($license->productId)) {
+            $license->addError('productId', Craft::t('{attribute} cannot be blank.', ['attribute' => 'Product']));
         }
 
-        if (empty($license->userId) && empty($license->licenseeEmail))
-        {
+        if (empty($license->userId) && empty($license->licenseeEmail)) {
             $license->addError('userId', Craft::t('A license must have either an email or a licensee assigned to it.'));
             $license->addError('licenseeEmail', Craft::t('A license must have either an email or a licensee assigned to it.'));
         }
 
         if (
             (!craft()->config->exists('assignUserOnPurchase', 'digitalProducts') || craft()->config->get('assignUserOnPurchase', 'digitalProducts'))
-            && empty($license->userId) && !empty($license->licenseeEmail) && $user = craft()->users->getUserByEmail($license->licenseeEmail))
-        {
+            && empty($license->userId) && !empty($license->licenseeEmail) && $user = craft()->users->getUserByEmail($license->licenseeEmail)
+        ) {
             $license->userId = $user->id;
         }
 
@@ -108,12 +103,10 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
                 ['id' => $product->typeId]));
         }
 
-        if (!$record->id)
-        {
+        if (!$record->id) {
             // TODO should we check if this will not clash with the index?
             $record->licenseKey = DigitalProductsHelper::generateLicenseKey($productType->licenseKeyAlphabet, $productType->licenseKeyLength);
         }
-
 
         $record->validate();
         $license->addErrors($record->getErrors());
@@ -125,22 +118,32 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         $transaction = craft()->db->getCurrentTransaction() === null ? craft()->db->beginTransaction() : null;
 
         try {
-            $success = craft()->elements->saveElement($license, false);
+            $event = new Event($this, ['license' => $license]);
+            $this->onBeforeSaveLicense($event);
 
-            if (!$success) {
-                if ($transaction !== null) {
-                    $transaction->rollback();
+            if ($event->performAction) {
+                $success = craft()->elements->saveElement($license, false);
+
+                if (!$success) {
+                    if ($transaction !== null) {
+                        $transaction->rollback();
+                    }
+
+                    return false;
                 }
 
+                $record->save(false);
+                $license->id = $record->id;
+            } else {
                 return false;
             }
-
-            $record->id = $license->id;
-            $record->save(false);
 
             if ($transaction !== null) {
                 $transaction->commit();
             }
+
+            $event = new Event($this, ['license' => $license]);
+            $this->onSaveLicense($event);
         } catch (\Exception $e) {
             if ($transaction !== null) {
                 $transaction->rollback();
@@ -159,9 +162,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
      */
     public static function handleCompletedOrder(Event $event)
     {
-
-        if (empty($event->params['order']))
-        {
+        if (empty($event->params['order'])) {
             return;
         }
 
@@ -174,19 +175,16 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         /**
          * @var Commerce_LineItemModel $lineItem
          */
-        foreach ($lineItems as $lineItem)
-        {
+        foreach ($lineItems as $lineItem) {
             $itemId = $lineItem->purchasableId;
             $element = craft()->elements->getElementById($itemId);
             $quantity = $lineItem->qty;
 
-            if ($element->getElementType() == "DigitalProducts_Product")
-            {
+            if ($element->getElementType() == "DigitalProducts_Product") {
                 /**
                  * @var DigitalProducts_ProductModel $element
                  */
-                for ($i = 0; $i < $quantity; $i++)
-                {
+                for ($i = 0; $i < $quantity; $i++) {
                     craft()->digitalProducts_licenses->licenseProductByOrder($element, $order);
                 }
             }
@@ -195,8 +193,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
 
     public static function handleUserActivation(Event $event)
     {
-        if (empty($event->params['user']))
-        {
+        if (empty($event->params['user'])) {
             return;
         }
 
@@ -205,17 +202,14 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
          */
         $user = $event->params['user'];
         $email = $user->email;
-
-        $licenses = craft()->digitalProducts_licenses->getLicenses(array('licenseeEmail' => $email));
+        $licenses = craft()->digitalProducts_licenses->getLicenses(['licenseeEmail' => $email]);
 
         /**
          * @var DigitalProducts_LicenseModel $license
          */
-        foreach ($licenses as $license)
-        {
+        foreach ($licenses as $license) {
             // Only licenses with unassigned users
-            if (!$license->userId)
-            {
+            if (!$license->userId) {
                 $license->userId = $user->id;
                 craft()->digitalProducts_licenses->saveLicense($license);
             }
@@ -238,20 +232,41 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         $license->productId = $product->id;
         $customer = $order->getCustomer();
 
-        if ($customer && $user = $customer->getUser())
-        {
+        if ($customer && $user = $customer->getUser()) {
             $license->licenseeEmail = $user->email;
             $license->licenseeName = $user->getName();
             $license->userId = $user->id;
-        }
-        else
-        {
+        } else {
             $license->licenseeEmail = $customer->email;
         }
-        
+
         $license->enabled = 1;
         $license->orderId = $order->id;
 
         return $this->saveLicense($license);
+    }
+
+    /**
+     * Event method
+     *
+     * @param Event $event
+     *
+     * @throws \CException
+     */
+    public function onBeforeSaveLicense(Event $event)
+    {
+        $this->raiseEvent('onBeforeSaveLicense', $event);
+    }
+
+    /**
+     * Event method
+     *
+     * @param Event $event
+     *
+     * @throws \CException
+     */
+    public function onSaveLicense(Event $event)
+    {
+        $this->raiseEvent('onSaveLicense', $event);
     }
 }
