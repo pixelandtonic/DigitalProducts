@@ -71,7 +71,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         }
 
         if (
-            (!craft()->config->exists('assignUserOnPurchase', 'digitalProducts') || craft()->config->get('assignUserOnPurchase', 'digitalProducts'))
+            (!craft()->config->exists('autoAssignUserOnPurchase', 'digitalProducts') || craft()->config->get('autoAssignUserOnPurchase', 'digitalProducts'))
             && empty($license->userId) && !empty($license->licenseeEmail) && $user = craft()->users->getUserByEmail($license->licenseeEmail)
         ) {
             $license->userId = $user->id;
