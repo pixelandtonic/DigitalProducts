@@ -191,9 +191,19 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         }
     }
 
+    /**
+     * If a user is activated and a license is assigned to the user's email,
+     * assign it to the user if the config settings do not prevent that.
+     *
+     * @param Event $event
+     */
     public static function handleUserActivation(Event $event)
     {
         if (empty($event->params['user'])) {
+            return;
+        }
+
+        if (craft()->config->exists('autoAssignLicensesOnUserRegistration', 'digitalProducts') && !craft()->config->get('autoAssignLicensesOnUserRegistration', 'digitalProducts')) {
             return;
         }
 
