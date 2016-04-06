@@ -132,8 +132,8 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
                     return false;
                 }
 
+                $record->id = $license->id;
                 $record->save(false);
-                $license->id = $record->id;
             } else {
                 return false;
             }
