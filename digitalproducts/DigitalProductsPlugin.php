@@ -175,9 +175,13 @@ class DigitalProductsPlugin extends BasePlugin
         craft()->templates->includeJsResource('digitalproducts/js/DigitalProductsProductIndex.js');
     }
 
+    /**
+     * Register the event handlers.
+     */
     private function _registerEventHandlers()
     {
         craft()->on('commerce_orders.onOrderComplete', ['\Craft\DigitalProducts_LicensesService', 'handleCompletedOrder']);
         craft()->on('users.onActivateUser', ['\Craft\DigitalProducts_LicensesService', 'handleUserActivation']);
+        craft()->on('commerce_payments.onBeforeGatewayRequestSend', ['\Craft\DigitalProducts_LicensesService', 'maybePreventPayment']);
     }
 }

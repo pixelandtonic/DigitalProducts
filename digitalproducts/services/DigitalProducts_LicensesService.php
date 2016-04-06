@@ -192,6 +192,51 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
     }
 
     /**
+     * Prevent the order from taking place if the user is not logged in but the
+     * config require it and the order contains digital products.
+     *
+     * @param Event $event
+     */
+    public static function maybePreventPayment(Event $event)
+    {
+        if (!(craft()->config->get('requireLoggedInUser', 'digitalProducts') && craft()->userSession->isGuest())) {
+            return;
+        }
+
+        if (empty($event->params['transaction'])) {
+            return;
+        }
+
+        /**
+         * @var Commerce_OrderModel $order
+         * @var Commerce_TransactionModel $transaction
+         */
+        $transaction = $event->params['transaction'];
+        $order = $transaction->order;
+
+        if (!$order)
+        {
+            return;
+        }
+
+        $lineItems = $order->getLineItems();
+
+        /**
+         * @var Commerce_LineItemModel $lineItem
+         */
+        foreach ($lineItems as $lineItem) {
+            $itemId = $lineItem->purchasableId;
+            $element = craft()->elements->getElementById($itemId);
+
+            if ($element->getElementType() == "DigitalProducts_Product") {
+                $transaction->message = Craft::t("You must be logged in to complete this transaction!");
+                $event->performAction = false;
+                return;
+            }
+        }
+    }
+
+    /**
      * If a user is activated and a license is assigned to the user's email,
      * assign it to the user if the config settings do not prevent that.
      *
