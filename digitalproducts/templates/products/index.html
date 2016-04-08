@@ -7,14 +7,6 @@
 {% set docTitle = title~' - '~'Digital Products' %}
 {% set elementType = 'DigitalProducts_Product' %}
 
-{% block content %}
-	{% if not craft.digitalProducts.getAllProductTypes()|length > 0 %}
-		<p class="error">{{ 'No product types exist yet.'|t }} <a class="go" href="{{ url('digitalproducts/producttypes/new') }}">{{ 'Create one'|t }}</a></p>
-	{% else %}
-		{{ parent() }}
-	{% endif %}
-{% endblock %}
-
 {% if productTypeHandle is defined %}
 	{% includejs 'window.defaultProductTypeHandle = "'~productTypeHandle~'";' %}
 {% endif %}
