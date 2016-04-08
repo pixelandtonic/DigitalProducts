@@ -5,7 +5,8 @@
 
 {% set crumbs = [
 	{ label: "Products"|t, url: url('digitalProducts/products') },
-	{ label: productType.name|t, url: url('digitalProducts/products/'~productType.handle) }
+	{ label: productType.name|t, url: url('digitalProducts/products/'~productType.handle) },
+	{ label: product.id ? product.title|t : 'New', url: url('digitalproducts/products/'~productType.handle~'/'~(product.id ?: 'new')) }
 ] %}
 
 {% set fullPageForm = true %}
