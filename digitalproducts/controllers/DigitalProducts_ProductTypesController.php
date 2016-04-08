@@ -27,18 +27,19 @@ class DigitalProducts_ProductTypesController extends BaseController
      */
     public function actionEdit(array $variables = [])
     {
-        if (empty($variables['productTypeId'])) {
-            $productType = new DigitalProducts_ProductTypeModel();
-        } else {
-            $productType = craft()->digitalProducts_productTypes->getProductTypeById($variables['productTypeId']);
-            if (!$productType)
-            {
+        if (empty($variables['productType'])) {
+            if (empty($variables['productTypeId'])) {
+                $productType = new DigitalProducts_ProductTypeModel();
+            } else {
+                $productType = craft()->digitalProducts_productTypes->getProductTypeById($variables['productTypeId']);
+            }
+            if (!$productType) {
                 $productType = new DigitalProducts_ProductTypeModel();;
             }
+            $variables['productType'] = $productType;
         }
 
         $variables['title'] = empty($productType->id) ? Craft::t("Create a new Digital Product Type") : $productType->name;
-        $variables['productType'] = $productType;
 
         $this->renderTemplate('digitalproducts/producttypes/_edit', $variables);
     }
