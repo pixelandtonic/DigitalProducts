@@ -7,6 +7,11 @@
 	productFields:       { label: "Product fields"|t, url: '#product-fields' },
 } %}
 
+{% set crumbs = [
+	{ label: "Digital product types"|t, url: url('digitalproducts/producttypes/index') },
+	{ label: productType.id ? productType.name|t : 'New', url: url('digitalproducts/producttypes/'~(productType.id ?: 'new')) }
+] %}
+
 {% set fullPageForm = true %}
 
 {% set selectedTab = 'settings' %}
