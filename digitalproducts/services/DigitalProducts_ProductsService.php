@@ -125,24 +125,18 @@ class DigitalProducts_ProductsService extends BaseApplicationComponent
     }
 
     /**
-     * @param Commerce_ProductModel $product
+     * @param DigitalProducts_ProductModel $product
      *
      * @return bool
      * @throws \CDbException
      */
     public function deleteProduct($product)
     {
-        $product = Commerce_ProductRecord::model()->findById($product->id);
+        $product = DigitalProducts_ProductRecord::model()->findById($product->id);
         if ($product) {
-            $variants = craft()->commerce_variants->getAllVariantsByProductId($product->id);
             if (craft()->elements->deleteElementById($product->id)) {
-                foreach ($variants as $v) {
-                    craft()->elements->deleteElementById($v->id);
-                }
-
                 return true;
             } else {
-
                 return false;
             }
         }
