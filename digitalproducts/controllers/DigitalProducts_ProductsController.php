@@ -18,8 +18,8 @@ class DigitalProducts_ProductsController extends BaseController
      */
     public function init()
     {
-        if (!craft()->userSession->checkPermission('commerce-manageProducts')) {
-            throw new HttpException(403, Craft::t('You don\'t have permissions to do that.'));
+        if (!craft()->userSession->checkPermission('digitalProducts-manageProducts')) {
+            throw new HttpException(403, Craft::t('This action is not allowed for the current user.'));
         }
         parent::init();
     }
@@ -43,6 +43,11 @@ class DigitalProducts_ProductsController extends BaseController
     {
         $this->_prepProductVariables($variables);
 
+        // Check if the user can edit the products in the product type
+        if (!craft()->userSession->getUser()->can('digitalProducts-manageProductType:'.$variables['productType']->id)) {
+            throw new HttpException(403, Craft::t('This action is not allowed for the current user.'));
+        }
+        
         if (!empty($variables['product']->id)) {
             $variables['title'] = $variables['product']->title;
         } else {
@@ -168,6 +173,11 @@ class DigitalProducts_ProductsController extends BaseController
                 ['id' => $productId]));
         }
 
+        // Check if the user can edit the products in the product type
+        if (!craft()->userSession->getUser()->can('digitalProducts-manageProductType:'.$product->typeId)) {
+            throw new HttpException(403, Craft::t('This action is not allowed for the current user.'));
+        }
+
         if (craft()->digitalProducts_products->deleteProduct($product)) {
             if (craft()->request->isAjaxRequest()) {
                 $this->returnJson(['success' => true]);
@@ -196,6 +206,11 @@ class DigitalProducts_ProductsController extends BaseController
         $this->requirePostRequest();
 
         $product = $this->_setProductFromPost();
+
+        // Check if the user can edit the products in the product type
+        if (!craft()->userSession->getUser()->can('digitalProducts-manageProductType:'.$product->typeId)) {
+            throw new HttpException(403, Craft::t('This action is not allowed for the current user.'));
+        }
 
         $existingProduct = (bool)$product->id;
 

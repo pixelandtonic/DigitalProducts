@@ -70,8 +70,16 @@ class DigitalProducts_ProductElementType extends BaseElementType
      */
     public function getSources($context = null)
     {
-        $editable = $context == 'index' ? true : false;
-        $productTypes = craft()->digitalProducts_productTypes->getProductTypes();
+        if ($context == 'index')
+        {
+            $productTypes = craft()->digitalProducts_productTypes->getEditableProductTypes();
+            $editable = true;
+        }
+        else
+        {
+            $productTypes = craft()->digitalProducts_productTypes->getAllProductTypes();
+            $editable = false;
+        }
 
         $productTypeIds = array();
 
@@ -92,7 +100,7 @@ class DigitalProducts_ProductElementType extends BaseElementType
 
         foreach ($productTypes as $productType) {
             $key = 'productType:' . $productType->id;
-            $canEditProducts = craft()->userSession->checkPermission('commerce-manageProductType:'.$productType->id);
+            $canEditProducts = craft()->userSession->checkPermission('digitalProducts-manageProductType:'.$productType->id);
 
             $sources[$key] = [
                 'label' => $productType->name,
@@ -354,7 +362,7 @@ class DigitalProducts_ProductElementType extends BaseElementType
             }
 
             // Limit the query to only the sections the user has permission to edit
-            $editableProductTypeIds = craft()->commerce_productTypes->getEditableProductTypeIds();
+            $editableProductTypeIds = craft()->digitalProducts_productTypes->getEditableProductTypeIds();
 
             if (!$editableProductTypeIds) {
                 return false;

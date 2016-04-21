@@ -12,7 +12,7 @@ class DigitalProducts_ProductTypesController extends BaseController
 {
     public function init()
     {
-        if (!craft()->userSession->checkPermission('commerce-manageProducts')) {
+        if (!craft()->userSession->checkPermission('digitalProducts-manageProductTypes')) {
             throw new HttpException(403, Craft::t('You don\'t have permissions to do that.'));
         }
         parent::init();
@@ -38,8 +38,8 @@ class DigitalProducts_ProductTypesController extends BaseController
             }
             $variables['productType'] = $productType;
         }
-
-        $variables['title'] = empty($productType->id) ? Craft::t("Create a new Digital Product Type") : $productType->name;
+        
+        $variables['title'] = empty($variables['productType']->id) ? Craft::t("Create a new Digital Product Type") : $variables['productType']->name;
 
         $this->renderTemplate('digitalproducts/producttypes/_edit', $variables);
     }
@@ -49,10 +49,6 @@ class DigitalProducts_ProductTypesController extends BaseController
      */
     public function actionSave()
     {
-        if (!craft()->userSession->getUser()->can('commerce-manageProducts')) {
-            throw new HttpException(403, Craft::t('This action is not allowed for the current user.'));
-        }
-
         $this->requirePostRequest();
 
         $productType = new DigitalProducts_ProductTypeModel();
@@ -71,7 +67,7 @@ class DigitalProducts_ProductTypesController extends BaseController
         foreach (craft()->i18n->getSiteLocaleIds() as $localeId) {
             $locales[$localeId] = new DigitalProducts_ProductTypeLocaleModel([
                 'locale' => $localeId,
-                'urlFormat' => craft()->request->getPost('urlFormat.' . $localeId)
+                'urlFormat' => craft()->request->getPost('urlFormat.'.$localeId)
             ]);
         }
 

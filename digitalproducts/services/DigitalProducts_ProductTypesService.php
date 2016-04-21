@@ -20,6 +20,16 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
     private $_productTypesById;
 
     /**
+     * @var
+     */
+    private $_allProductTypeIds;
+
+    /**
+     * @var
+     */
+    private $_editableProductTypeIds;
+
+    /**
      * Get product types.
      *
      * @param array|\CDbCriteria $criteria
@@ -50,6 +60,123 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
         return DigitalProducts_ProductTypeLocaleModel::populateModels($records, $indexBy);
     }
 
+    /**
+     * Returns all Product Types
+     *
+     * @param string|null $indexBy
+     * @return DigitalProducts_ProductTypeModel[]
+     */
+    public function getAllProductTypes($indexBy = null)
+    {
+        if (!$this->_fetchedAllProductTypes) {
+            $results = DigitalProducts_ProductTypeRecord::model()->findAll();
+
+            if (!isset($this->_productTypesById))
+            {
+                $this->_productTypesById = [];
+            }
+
+            foreach($results as $result){
+                $productType = DigitalProducts_ProductTypeModel::populateModel($result);
+                $this->_productTypesById[$productType->id] = $productType;
+            }
+
+            $this->_fetchedAllProductTypes = true;
+        }
+
+        if ($indexBy == 'id')
+        {
+            $productTypes = $this->_productTypesById;
+        }
+        else if (!$indexBy)
+        {
+            $productTypes = array_values($this->_productTypesById);
+        }
+        else
+        {
+            $productTypes = array();
+            foreach ($this->_productTypesById as $productType)
+            {
+                $productTypes[$productType->$indexBy] = $productType;
+            }
+        }
+
+        return $productTypes;
+    }
+
+    /**
+     * Returns all of the product type IDs.
+     *
+     * @return array All the product types’ IDs.
+     */
+    public function getAllProductTypeIds()
+    {
+        if (!isset($this->_allProductTypeIds))
+        {
+            $this->_allProductTypeIds = array();
+
+            foreach ($this->getAllProductTypes() as $productType)
+            {
+                $this->_allProductTypeIds[] = $productType->id;
+            }
+        }
+
+        return $this->_allProductTypeIds;
+    }
+
+    /**
+     * Returns all of the product type IDs that are editable by the current user.
+     *
+     * @return array All the editable product types’ IDs.
+     */
+    public function getEditableProductTypeIds()
+    {
+        if (!isset($this->_editableProductTypeIds))
+        {
+            $this->_editableProductTypeIds = array();
+
+            foreach ($this->getAllProductTypeIds() as $productTypeId)
+            {
+                if (craft()->userSession->checkPermission('digitalProducts-manageProductType:'.$productTypeId))
+                {
+                    $this->_editableProductTypeIds[] = $productTypeId;
+                }
+            }
+        }
+
+        return $this->_editableProductTypeIds;
+    }
+
+    /**
+     * Returns all editable product types.
+     *
+     * @param string|null $indexBy
+     *
+     * @return Commerce_ProductTypeModel[] All the editable product types.
+     */
+    public function getEditableProductTypes($indexBy = null)
+    {
+        $editableProductTypeIds = $this->getEditableProductTypeIds();
+        $editableProductTypes = array();
+
+        foreach ($this->getAllProductTypes() as $productTypes)
+        {
+            if (in_array($productTypes->id, $editableProductTypeIds))
+            {
+                if ($indexBy)
+                {
+                    $editableProductTypes[$productTypes->$indexBy] = $productTypes;
+                }
+                else
+                {
+                    $editableProductTypes[] = $productTypes;
+                }
+            }
+        }
+
+        return $editableProductTypes;
+    }
+    
     /**
      * Save a product type.
      *

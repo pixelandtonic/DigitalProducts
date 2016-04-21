@@ -12,7 +12,7 @@ class DigitalProducts_LicensesController extends BaseController
 {
     public function init()
     {
-        if (!craft()->userSession->checkPermission('commerce-manageOrders')) {
+        if (!craft()->userSession->checkPermission('digitalProducts-manageLicenses')) {
             throw new HttpException(403, Craft::t('You don\'t have permissions to do that.'));
         }
         parent::init();
@@ -39,7 +39,7 @@ class DigitalProducts_LicensesController extends BaseController
                     $license = new DigitalProducts_LicenseModel();;
                 }
             }
-            
+
             $variables['license'] = $license;
         }
 
