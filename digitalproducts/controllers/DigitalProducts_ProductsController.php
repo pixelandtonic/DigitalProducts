@@ -4,6 +4,7 @@ namespace Craft;
 /**
  * Class DigitalProducts_ProductsController
  *
+ * @TODO reorder methods properly.
  * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @copyright Copyright (c) 2016, Pixel & Tonic, Inc.
  */
@@ -47,7 +48,7 @@ class DigitalProducts_ProductsController extends BaseController
         if (!craft()->userSession->getUser()->can('digitalProducts-manageProductType:'.$variables['productType']->id)) {
             throw new HttpException(403, Craft::t('This action is not allowed for the current user.'));
         }
-        
+
         if (!empty($variables['product']->id)) {
             $variables['title'] = $variables['product']->title;
         } else {
@@ -59,8 +60,41 @@ class DigitalProducts_ProductsController extends BaseController
 
         $this->_prepVariables($variables);
 
+        // Enable Live Preview?
+        if (!craft()->request->isMobileBrowser(true) && craft()->digitalProducts_productTypes->isProductTypeTemplateValid($variables['productType'])) {
+            craft()->templates->includeJs('Craft.LivePreview.init('.JsonHelper::encode([
+                    'fields' => '#title-field, #fields > div > div > .field, #sku-field, #price-field',
+                    'extraFields' => '#meta-pane .field',
+                    'previewUrl' => $variables['product']->getUrl(),
+                    'previewAction' => 'digitalProducts/products/previewProduct',
+                    'previewParams' => [
+                        'typeId' => $variables['productType']->id,
+                        'productId' => $variables['product']->id,
+                        'locale' => $variables['product']->locale,
+                    ]
+                ]).');');
+
+            $variables['showPreviewBtn'] = true;
+
+            // Should we show the Share button too?
+            if ($variables['product']->id) {
+                // If the product is enabled, use its main URL as its share URL.
+                if ($variables['product']->getStatus() == DigitalProducts_ProductModel::LIVE) {
+                    $variables['shareUrl'] = $variables['product']->getUrl();
+                } else {
+                    $variables['shareUrl'] = UrlHelper::getActionUrl('digitalProducts/products/shareProduct', [
+                        'productId' => $variables['product']->id,
+                        'locale' => $variables['product']->locale
+                    ]);
+                }
+            }
+        } else {
+            $variables['showPreviewBtn'] = false;
+        }
+
         $this->renderTemplate('digitalproducts/products/_edit', $variables);
     }
+
 
     /**
      * Prepare product variables from POSt data.
@@ -109,7 +143,7 @@ class DigitalProducts_ProductsController extends BaseController
             } else {
                 $variables['product'] = new DigitalProducts_ProductModel();
                 $variables['product']->typeId = $variables['productType']->id;
-                
+
                 if (!empty($variables['localeId'])) {
                     $variables['product']->locale = $variables['localeId'];
                 }
@@ -277,5 +311,56 @@ class DigitalProducts_ProductsController extends BaseController
         $product->setContentFromPost('fields');
 
         return $product;
+    }
+
+    /**
+     * Previews a product.
+     *
+     * @throws HttpException
+     * @return null
+     */
+    public function actionPreviewProduct()
+    {
+
+        $this->requirePostRequest();
+
+        $product = $this->_setProductFromPost();
+
+        // Check if the user can edit the products in the product type
+        if (!craft()->userSession->getUser()->can('digitalProducts-manageProductType:'.$product->typeId)) {
+            throw new HttpException(403, Craft::t('This action is not allowed for the current user.'));
+        }
+
+        $this->_showProduct($product);
+    }
+
+    /**
+     * Displays a product.
+     *
+     * @param DigitalProducts_ProductModel $product
+     *
+     * @throws HttpException
+     * @return null
+     */
+    private function _showProduct(DigitalProducts_ProductModel $product)
+    {
+        $productType = $product->getProductType();
+
+        if (!$productType)
+        {
+            Craft::log('Attempting to preview a product that doesn’t have a type', LogLevel::Error);
+            throw new HttpException(404);
+        }
+
+        craft()->setLanguage($product->locale);
+
+        // Have this product override any freshly queried products with the same ID/locale
+        craft()->elements->setPlaceholderElement($product);
+
+        craft()->templates->getTwig()->disableStrictVariables();
+
+        $this->renderTemplate($productType->template, array(
+            'product' => $product
+        ));
     }
 }

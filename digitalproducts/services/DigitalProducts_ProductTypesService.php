@@ -64,6 +64,7 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
      * Returns all Product Types
      *
      * @param string|null $indexBy
+     *
      * @return DigitalProducts_ProductTypeModel[]
      */
     public function getAllProductTypes($indexBy = null)
@@ -71,12 +72,11 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
         if (!$this->_fetchedAllProductTypes) {
             $results = DigitalProducts_ProductTypeRecord::model()->findAll();
 
-            if (!isset($this->_productTypesById))
-            {
+            if (!isset($this->_productTypesById)) {
                 $this->_productTypesById = [];
             }
 
-            foreach($results as $result){
+            foreach ($results as $result) {
                 $productType = DigitalProducts_ProductTypeModel::populateModel($result);
                 $this->_productTypesById[$productType->id] = $productType;
             }
@@ -84,19 +84,13 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
             $this->_fetchedAllProductTypes = true;
         }
 
-        if ($indexBy == 'id')
-        {
+        if ($indexBy == 'id') {
             $productTypes = $this->_productTypesById;
-        }
-        else if (!$indexBy)
-        {
+        } else if (!$indexBy) {
             $productTypes = array_values($this->_productTypesById);
-        }
-        else
-        {
-            $productTypes = array();
-            foreach ($this->_productTypesById as $productType)
-            {
+        } else {
+            $productTypes = [];
+            foreach ($this->_productTypesById as $productType) {
                 $productTypes[$productType->$indexBy] = $productType;
             }
         }
@@ -111,12 +105,10 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
      */
     public function getAllProductTypeIds()
     {
-        if (!isset($this->_allProductTypeIds))
-        {
-            $this->_allProductTypeIds = array();
+        if (!isset($this->_allProductTypeIds)) {
+            $this->_allProductTypeIds = [];
 
-            foreach ($this->getAllProductTypes() as $productType)
-            {
+            foreach ($this->getAllProductTypes() as $productType) {
                 $this->_allProductTypeIds[] = $productType->id;
             }
         }
@@ -131,14 +123,11 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
      */
     public function getEditableProductTypeIds()
     {
-        if (!isset($this->_editableProductTypeIds))
-        {
-            $this->_editableProductTypeIds = array();
+        if (!isset($this->_editableProductTypeIds)) {
+            $this->_editableProductTypeIds = [];
 
-            foreach ($this->getAllProductTypeIds() as $productTypeId)
-            {
-                if (craft()->userSession->checkPermission('digitalProducts-manageProductType:'.$productTypeId))
-                {
+            foreach ($this->getAllProductTypeIds() as $productTypeId) {
+                if (craft()->userSession->checkPermission('digitalProducts-manageProductType:'.$productTypeId)) {
                     $this->_editableProductTypeIds[] = $productTypeId;
                 }
             }
@@ -157,18 +146,13 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
     public function getEditableProductTypes($indexBy = null)
     {
         $editableProductTypeIds = $this->getEditableProductTypeIds();
-        $editableProductTypes = array();
+        $editableProductTypes = [];
 
-        foreach ($this->getAllProductTypes() as $productTypes)
-        {
-            if (in_array($productTypes->id, $editableProductTypeIds))
-            {
-                if ($indexBy)
-                {
+        foreach ($this->getAllProductTypes() as $productTypes) {
+            if (in_array($productTypes->id, $editableProductTypeIds)) {
+                if ($indexBy) {
                     $editableProductTypes[$productTypes->$indexBy] = $productTypes;
-                }
-                else
-                {
+                } else {
                     $editableProductTypes[] = $productTypes;
                 }
             }
@@ -176,7 +160,7 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
 
         return $editableProductTypes;
     }
-    
+
     /**
      * Save a product type.
      *
@@ -392,25 +376,21 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
      */
     public function getProductTypeById($productTypeId)
     {
-        if(!$this->_fetchedAllProductTypes &&
+        if (!$this->_fetchedAllProductTypes &&
             (!isset($this->_productTypesById) || !array_key_exists($productTypeId, $this->_productTypesById))
-        )
-        {
+        ) {
             $result = DigitalProducts_ProductTypeRecord::model()->findById($productTypeId);
 
             if ($result) {
                 $productType = DigitalProducts_ProductTypeModel::populateModel($result);
-            }
-            else
-            {
+            } else {
                 $productType = null;
             }
 
             $this->_productTypesById[$productTypeId] = $productType;
         }
 
-        if (isset($this->_productTypesById[$productTypeId]))
-        {
+        if (isset($this->_productTypesById[$productTypeId])) {
             return $this->_productTypesById[$productTypeId];
         }
 
@@ -428,8 +408,7 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
     {
         $result = DigitalProducts_ProductTypeRecord::model()->findByAttributes(['handle' => $handle]);
 
-        if ($result)
-        {
+        if ($result) {
             $productType = DigitalProducts_ProductTypeModel::populateModel($result);
             $this->_productTypesById[$productType->id] = $productType;
 
@@ -475,12 +454,79 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
                 $transaction->commit();
             }
 
-            return (bool) $affectedRows;
+            return (bool)$affectedRows;
         } catch (\Exception $e) {
             if ($transaction !== null) {
                 $transaction->rollback();
             }
             throw $e;
         }
+    }
+
+    /**
+     * Returns true if Product Type has a valid template set.
+     *
+     * @param DigitalProducts_ProductTypeModel $productType
+     *
+     * @return bool
+     */
+    public function isProductTypeTemplateValid(DigitalProducts_ProductTypeModel $productType)
+    {
+        if ($productType->hasUrls) {
+            // Set Craft to the site template mode
+            $templatesService = craft()->templates;
+            $oldTemplateMode = $templatesService->getTemplateMode();
+            $templatesService->setTemplateMode(TemplateMode::Site);
+
+            // Does the template exist?
+            $templateExists = $templatesService->doesTemplateExist($productType->template);
+
+            // Restore the original template mode
+            $templatesService->setTemplateMode($oldTemplateMode);
+
+            if ($templateExists) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Event $event
+     *
+     * @return bool
+     */
+    public function addLocaleHandler(Event $event)
+    {
+        /** @var Commerce_OrderModel $order */
+        $localeId = $event->params['localeId'];
+
+        // Add this locale to each of the category groups
+        $productTypeLocales = craft()->db->createCommand()
+            ->select('productTypeId, urlFormat')
+            ->from('digitalproducts_producttypes_i18n')
+            ->where('locale = :locale', [':locale' => craft()->i18n->getPrimarySiteLocaleId()])
+            ->queryAll();
+
+        if ($productTypeLocales) {
+            $newProductTypeLocales = [];
+
+            foreach ($productTypeLocales as $productTypeLocale) {
+                $newProductTypeLocales[] = [
+                    $productTypeLocale['productTypeId'],
+                    $localeId,
+                    $productTypeLocale['urlFormat']
+                ];
+            }
+
+            craft()->db->createCommand()->insertAll('commerce_producttypes_i18n', [
+                'productTypeId',
+                'locale',
+                'urlFormat'
+            ], $newProductTypeLocales);
+        }
+
+        return true;
     }
 }

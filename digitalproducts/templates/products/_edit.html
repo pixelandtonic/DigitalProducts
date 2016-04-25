@@ -48,22 +48,31 @@
 					{{ productFields.titleField(product) }}
 
 					<div>
-					{% set allProductTab = productType.asa('productFieldLayout').getFieldLayout().getTabs() %}
-					{% for tab in allProductTab %}
-						<div id="tab{{ loop.index }}" {% if not loop.first %} class="hidden" {% endif %}>
-							{% include "_includes/fields" with {
-							fields: tab.getFields(),
-							element: product,
-							} only %}
-						</div>
-					{% endfor %}
+						{% set allProductTab = productType.asa('productFieldLayout').getFieldLayout().getTabs() %}
+
+						{% for tab in allProductTab %}
+							<div id="tab{{ loop.index }}" {% if not loop.first %} class="hidden" {% endif %}>
+								{% include "_includes/fields" with {
+								fields: tab.getFields(),
+								element: product,
+								} only %}
+							</div>
+						{% endfor %}
+
+
 					</div>
 
 					{{ productFields.generalFields(product) }}
+
 				</div>
 			</div>
 
 			<div id="meta-pane" class="item" data-position="right">
+
+				{% if showPreviewBtn %}
+					{% include "_includes/previewbtns" %}
+				{% endif %}
+
 				{% if craft.isLocalized() %}
 					<ul id="locales" class="pane">
 						{% for localeId in localeIds %}
@@ -118,7 +127,12 @@
 				</div>
 
 				<div class="pane meta">
+					{{ productFields.pricingFields(product) }}
+				</div>
+				<div class="pane meta">
+
 					{{ productFields.behavioralMetaFields(product) }}
+
 				</div>
 
 				<div class="pane meta">

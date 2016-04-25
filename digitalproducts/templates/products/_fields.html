@@ -82,6 +82,12 @@
 		errors: product.getErrors('sku')
 	}) }}
 
+{% endmacro %}
+
+{% macro pricingFields(product) %}
+
+	{%- import "_includes/forms" as forms -%}
+
 	{{ forms.textField({
 		id: 'price',
 		label: 'Price'|t,
@@ -92,4 +98,5 @@
 		required: true,
 		errors: product.getErrors('price')
 	}) }}
+
 {% endmacro %}
