@@ -350,7 +350,7 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
                                 // Loop through each of the changed locales and update all of the products’ slugs and
                                 // URIs
                                 foreach ($changedLocaleIds as $localeId) {
-                                    $criteria = craft()->elements->getCriteria('DigitalProduct_Product');
+                                    $criteria = craft()->elements->getCriteria('DigitalProducts_Product');
                                     $criteria->id = $productId;
                                     $criteria->locale = $localeId;
                                     $criteria->status = null;
