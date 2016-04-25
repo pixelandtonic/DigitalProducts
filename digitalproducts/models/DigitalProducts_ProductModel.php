@@ -35,6 +35,39 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     }
 
     /**
+     * @return null|string
+     */
+    public function getStatus()
+    {
+        $status = parent::getStatus();
+
+        if ($status == static::ENABLED && $this->postDate)
+        {
+            $currentTime = DateTimeHelper::currentTimeStamp();
+            $postDate = $this->postDate->getTimestamp();
+            $expiryDate = ($this->expiryDate ? $this->expiryDate->getTimestamp() : null);
+
+            if ($postDate <= $currentTime && (!$expiryDate || $expiryDate > $currentTime))
+            {
+                return static::LIVE;
+            }
+            else
+            {
+                if ($postDate > $currentTime)
+                {
+                    return static::PENDING;
+                }
+                else
+                {
+                    return static::EXPIRED;
+                }
+            }
+        }
+
+        return $status;
+    }
+    
+    /**
      * @return bool
      */
     public function isLocalized()
@@ -72,6 +105,26 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
         }
 
         return null;
+    }
+
+    /*
+     * Returns the URL format used to generate this element's URL.
+     *
+     * @return string
+     */
+    public function getUrlFormat()
+    {
+        $productType = $this->getProductType();
+
+        if ($productType && $productType->hasUrls) {
+            $productTypeLocales = $productType->getLocales();
+
+            if (isset($productTypeLocales[$this->locale])) {
+                return $productTypeLocales[$this->locale]->urlFormat;
+            }
+        }
+
+        return '';
     }
 
     /**

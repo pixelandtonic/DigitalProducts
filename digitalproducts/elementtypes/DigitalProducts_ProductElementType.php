@@ -439,9 +439,9 @@ class DigitalProducts_ProductElementType extends BaseElementType
      */
     public function routeRequestForMatchedElement(BaseElementModel $element)
     {
-        /** @var Commerce_ProductModel $element */
-        if ($element->getStatus() == Commerce_ProductModel::LIVE) {
-            $productType = $element->type;
+        /** @var DigitalProducts_ProductModel $element */
+        if ($element->getStatus() == DigitalProducts_ProductModel::LIVE) {
+            $productType = $element->getProductType();
 
             if ($productType->hasUrls) {
                 return [
