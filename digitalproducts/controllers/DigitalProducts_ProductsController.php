@@ -10,20 +10,11 @@ namespace Craft;
  */
 class DigitalProducts_ProductsController extends BaseController
 {
-    // TODO permissions
 
     /**
-     * Always check if user is allowed to do commerce-y stuff.
-     *
-     * @throws HttpException if lacking permissions.
+     * @inheritdoc
      */
-    public function init()
-    {
-        if (!craft()->userSession->checkPermission('digitalProducts-manageProducts')) {
-            throw new HttpException(403, Craft::t('This action is not allowed for the current user.'));
-        }
-        parent::init();
-    }
+    protected $allowAnonymous = ['actionViewSharedProduct'];
 
     /**
      * Index of digital products
@@ -207,10 +198,7 @@ class DigitalProducts_ProductsController extends BaseController
                 ['id' => $productId]));
         }
 
-        // Check if the user can edit the products in the product type
-        if (!craft()->userSession->getUser()->can('digitalProducts-manageProductType:'.$product->typeId)) {
-            throw new HttpException(403, Craft::t('This action is not allowed for the current user.'));
-        }
+        $this->_enforceProductPermissions($product);
 
         if (craft()->digitalProducts_products->deleteProduct($product)) {
             if (craft()->request->isAjaxRequest()) {
@@ -241,10 +229,7 @@ class DigitalProducts_ProductsController extends BaseController
 
         $product = $this->_setProductFromPost();
 
-        // Check if the user can edit the products in the product type
-        if (!craft()->userSession->getUser()->can('digitalProducts-manageProductType:'.$product->typeId)) {
-            throw new HttpException(403, Craft::t('This action is not allowed for the current user.'));
-        }
+        $this->_enforceProductPermissions($product);
 
         $existingProduct = (bool)$product->id;
 
@@ -264,7 +249,7 @@ class DigitalProducts_ProductsController extends BaseController
     }
 
     /**
-     * @return Commerce_ProductModel
+     * @return DigitalProducts_ProductModel
      * @throws Exception
      */
     private function _setProductFromPost()
@@ -325,10 +310,63 @@ class DigitalProducts_ProductsController extends BaseController
         $this->requirePostRequest();
 
         $product = $this->_setProductFromPost();
+        $this->_enforceProductPermissions($product);
 
-        // Check if the user can edit the products in the product type
-        if (!craft()->userSession->getUser()->can('digitalProducts-manageProductType:'.$product->typeId)) {
-            throw new HttpException(403, Craft::t('This action is not allowed for the current user.'));
+
+        $this->_showProduct($product);
+    }
+
+    /**
+     * Redirects the client to a URL for viewing a disabled product on the front end.
+     *
+     * @param mixed $productId
+     * @param mixed $locale
+     *
+     * @throws HttpException
+     * @return null
+     */
+    public function actionShareProduct($productId, $locale = null)
+    {
+        /**
+         * @var $product DigitalProducts_ProductModel
+         */
+        $product = craft()->digitalProducts_products->getProductById($productId, $locale);
+
+        if (!$product || !craft()->digitalProducts_productTypes->isProductTypeTemplateValid($product->getProductType()))
+        {
+            throw new HttpException(404);
+        }
+
+        $this->_enforceProductPermissions($product);
+
+        // Create the token and redirect to the product URL with the token in place
+        $token = craft()->tokens->createToken([
+            'action' => 'digitalProducts/products/viewSharedProduct',
+            'params' => ['productId' => $productId, 'locale' => $product->locale]
+        ]);
+
+        $url = UrlHelper::getUrlWithToken($product->getUrl(), $token);
+        craft()->request->redirect($url);
+    }
+
+    /**
+     * Shows an product/draft/version based on a token.
+     *
+     * @param mixed $productId
+     * @param mixed $locale
+     *
+     * @throws HttpException
+     * @return null
+     */
+    public function actionViewSharedProduct($productId, $locale = null)
+    {
+        $this->requireToken();
+
+        $product = craft()->digitalProducts_products->getProductById($productId, $locale);
+
+        if (!$product)
+        {
+            throw new HttpException(404);
         }
 
         $this->_showProduct($product);
@@ -348,7 +386,6 @@ class DigitalProducts_ProductsController extends BaseController
 
         if (!$productType)
         {
-            Craft::log('Attempting to preview a product that doesn’t have a type', LogLevel::Error);
             throw new HttpException(404);
         }
 
@@ -362,5 +399,23 @@ class DigitalProducts_ProductsController extends BaseController
         $this->renderTemplate($productType->template, array(
             'product' => $product
         ));
+    }
+
+    /**
+     * @param $product
+     *
+     * @throws HttpException
+     */
+    private function _enforceProductPermissions($product)
+    {
+        // Check for general digital product commerce access
+        if (!craft()->userSession->checkPermission('digitalProducts-manageProducts')) {
+            throw new HttpException(403, Craft::t('This action is not allowed for the current user.'));
+        }
+
+        // Check if the user can edit the products in the product type
+        if (!craft()->userSession->getUser()->can('digitalProducts-manageProductType:'.$product->typeId)) {
+            throw new HttpException(403, Craft::t('This action is not allowed for the current user.'));
+        }
     }
 }
