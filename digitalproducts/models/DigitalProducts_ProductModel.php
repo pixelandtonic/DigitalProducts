@@ -66,6 +66,21 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
 
         return $status;
     }
+
+    /**
+     * @return bool
+     */
+    public function isEditable()
+    {
+        if ($this->getProductType())
+        {
+            $id = $this->getProductType()->id;
+
+            return craft()->userSession->checkPermission('digitalProducts-manageProductType:'.$id);
+        }
+
+        return false;
+    }
     
     /**
      * @return bool

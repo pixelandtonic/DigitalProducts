@@ -396,36 +396,12 @@ class DigitalProducts_ProductElementType extends BaseElementType
     {
         /** @ var Commerce_ProductModel $element */
         $templatesService = craft()->templates;
-        $html = $templatesService->renderMacro('commerce/products/_fields', 'titleField', array($element));
-        $html .= $templatesService->renderMacro('commerce/products/_fields', 'generalMetaFields', array($element));
-        $html .= $templatesService->renderMacro('commerce/products/_fields', 'behavioralMetaFields', array($element));
+        $html = $templatesService->renderMacro('digitalProducts/products/_fields', 'titleField', array($element));
         $html .= parent::getEditorHtml($element);
-
-        $productType = $element->getType();
-
-        if ($productType->hasVariants) {
-            $html .= $templatesService->renderMacro('_includes/forms', 'field', array(
-                array(
-                    'label' => Craft::t('Variants'),
-                ),
-                VariantMatrixHelper::getVariantMatrixHtml($element)
-            ));
-        } else {
-            /** @var Commerce_VariantModel $variant */
-            $variant = ArrayHelper::getFirstValue($element->getVariants());
-            $namespace = $templatesService->getNamespace();
-            $newNamespace = 'variants['.($variant->id ?: 'new1').']';
-            $templatesService->setNamespace($newNamespace);
-            $html .= $templatesService->namespaceInputs($templatesService->renderMacro('commerce/products/_fields', 'generalVariantFields', array($variant)));
-
-            if ($productType->hasDimensions)
-            {
-                $html .= $templatesService->namespaceInputs($templatesService->renderMacro('commerce/products/_fields', 'dimensionVariantFields', array($variant)));
-            }
-
-            $templatesService->setNamespace($namespace);
-            $templatesService->includeJs('Craft.Commerce.initUnlimitedStockCheckbox($(".elementeditor").find(".meta"));');
-        }
+        $html .= $templatesService->renderMacro('digitalProducts/products/_fields', 'generalFields', array($element));
+        $html .= $templatesService->renderMacro('digitalProducts/products/_fields', 'pricingFields', array($element));
+        $html .= $templatesService->renderMacro('digitalProducts/products/_fields', 'behavioralMetaFields', array($element));
+        $html .= $templatesService->renderMacro('digitalProducts/products/_fields', 'generalMetaFields', array($element));
 
         return $html;
     }
