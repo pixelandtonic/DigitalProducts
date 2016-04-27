@@ -30,7 +30,7 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
     private $_editableProductTypeIds;
 
     /**
-     * Get product types.
+     * Get Product Types.
      *
      * @param array|\CDbCriteria $criteria
      *
@@ -44,7 +44,7 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
     }
 
     /**
-     * Get a product type's locales by it's id.
+     * Get a Product Type's locales by it's id.
      *
      * @param      $productTypeId
      * @param null $indexBy
@@ -61,7 +61,7 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
     }
 
     /**
-     * Returns all Product Types
+     * Returns all Product Types.
      *
      * @param string|null $indexBy
      *
@@ -99,9 +99,9 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
     }
 
     /**
-     * Returns all of the product type IDs.
+     * Returns all of the Product Type IDs.
      *
-     * @return array All the product types’ IDs.
+     * @return array
      */
     public function getAllProductTypeIds()
     {
@@ -117,9 +117,9 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
     }
 
     /**
-     * Returns all of the product type IDs that are editable by the current user.
+     * Returns all of the Product Type Ids that are editable by the current user.
      *
-     * @return array All the editable product types’ IDs.
+     * @return array
      */
     public function getEditableProductTypeIds()
     {
@@ -137,11 +137,11 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
     }
 
     /**
-     * Returns all editable product types.
+     * Returns all editable Product Types for the current user..
      *
      * @param string|null $indexBy
      *
-     * @return Commerce_ProductTypeModel[] All the editable product types.
+     * @return Commerce_ProductTypeModel[]
      */
     public function getEditableProductTypes($indexBy = null)
     {
@@ -162,14 +162,13 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
     }
 
     /**
-     * Save a product type.
+     * Save a Product Type.
      *
      * @param Commerce_ProductTypeModel $productType
      *
      * @return bool
-     * @throws Exception
-     * @throws \CDbException
-     * @throws \Exception
+     * @throws Exception in case of invalid data.
+     * @throws \Exception if saving of the Element failed causing a failed transaction
      */
     public function saveProductType(DigitalProducts_ProductTypeModel $productType)
     {
@@ -297,7 +296,6 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
                     }
                 }
 
-
                 if (!$isNewProductType) {
                     // Get all of the product IDs in this group
                     $criteria = craft()->elements->getCriteria('DigitalProducts_Product');
@@ -360,7 +358,6 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
 
                 throw $e;
             }
-
             return true;
         } else {
             return false;
@@ -368,7 +365,7 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
     }
 
     /**
-     * Get a product type by it's ID.
+     * Get a Product Type by it's Id.
      *
      * @param int $productTypeId
      *
@@ -398,7 +395,7 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
     }
 
     /**
-     * Get a product type by it's handle.
+     * Get a Product Type by it's handle.
      *
      * @param int $productTypeId
      *
@@ -419,13 +416,12 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
     }
 
     /**
-     * Delete a product type by it's id.
+     * Delete a Product Type by it's Id.
      *
      * @param $id
      *
      * @return bool
-     * @throws \CDbException
-     * @throws \Exception
+     * @throws \Exception if failed to delete the Product Type.
      */
     public function deleteProductTypeById($id)
     {
@@ -493,6 +489,7 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
     }
 
     /**
+     * Add a new locale to all Product Types if one is being added to Craft.
      * @param Event $event
      *
      * @return bool
@@ -520,7 +517,7 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
                 ];
             }
 
-            craft()->db->createCommand()->insertAll('commerce_producttypes_i18n', [
+            craft()->db->createCommand()->insertAll('digitalproducts_producttypes_i18n', [
                 'productTypeId',
                 'locale',
                 'urlFormat'

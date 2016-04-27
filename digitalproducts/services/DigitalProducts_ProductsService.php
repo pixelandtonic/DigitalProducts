@@ -10,7 +10,7 @@ namespace Craft;
 class DigitalProducts_ProductsService extends BaseApplicationComponent
 {
     /**
-     * Get a digital product by it's ID.
+     * Get a Digital Product by it's ID.
      *
      * @param int $id
      * @param int $localeId
@@ -23,7 +23,7 @@ class DigitalProducts_ProductsService extends BaseApplicationComponent
     }
 
     /**
-     * Get products by criteria
+     * Get Products by criteria.
      *
      * @param array|ElementCriteriaModel $criteria
      *
@@ -31,9 +31,7 @@ class DigitalProducts_ProductsService extends BaseApplicationComponent
      */
     public function getProducts($criteria = [])
     {
-
-        if (!$criteria instanceof ElementCriteriaModel)
-        {
+        if (!$criteria instanceof ElementCriteriaModel) {
             $criteria = craft()->elements->getCriteria('DigitalProducts_Product', $criteria);
         }
 
@@ -41,13 +39,14 @@ class DigitalProducts_ProductsService extends BaseApplicationComponent
     }
 
 
-
     /**
+     * Save a Product.
+     *
      * @param DigitalProducts_ProductModel $product
      *
      * @return bool
-     * @throws Exception
-     * @throws \Exception
+     * @throws Exception in case of invalid data
+     * @throws \Exception if saving of the Element failed causing a failed transaction
      */
     public function saveProduct(DigitalProducts_ProductModel $product)
     {
@@ -75,7 +74,6 @@ class DigitalProducts_ProductsService extends BaseApplicationComponent
             throw new Exception(Craft::t('No product type exists with the ID “{id}”',
                 ['id' => $product->typeId]));
         }
-
 
         if (empty($product->sku)) {
             try {
@@ -125,10 +123,12 @@ class DigitalProducts_ProductsService extends BaseApplicationComponent
     }
 
     /**
+     * Delete a Product.
+     *
      * @param DigitalProducts_ProductModel $product
      *
      * @return bool
-     * @throws \CDbException
+     * @throws \Exception
      */
     public function deleteProduct($product)
     {

@@ -20,7 +20,7 @@ class DigitalProducts_ProductsFieldType extends BaseElementFieldType
     protected $elementType = 'DigitalProducts_Product';
 
     /**
-     * @inheritDoc IComponentType::getName()
+     * @inheritDoc BaseElementFieldType::getName()
      *
      * @return string
      */

@@ -10,20 +10,23 @@ namespace Craft;
 
 class DigitalProducts_ProductTypesController extends BaseController
 {
+
+    /**
+     * @inheritDoc BaseController::init()
+     */
     public function init()
     {
         if (!craft()->userSession->checkPermission('digitalProducts-manageProductTypes')) {
             throw new HttpException(403, Craft::t('You don\'t have permissions to do that.'));
         }
+
         parent::init();
     }
 
     /**
-     * Create/Edit Product Type
+     * Create or edit a Product Type
      *
      * @param array $variables
-     *
-     * @throws HttpException
      */
     public function actionEdit(array $variables = [])
     {
@@ -45,7 +48,7 @@ class DigitalProducts_ProductTypesController extends BaseController
     }
 
     /**
-     * @throws HttpException
+     * Save a Product Type
      */
     public function actionSave()
     {
@@ -92,7 +95,7 @@ class DigitalProducts_ProductTypesController extends BaseController
     }
 
     /**
-     * @throws HttpException
+     * Delete a Product Type.
      */
     public function actionDelete()
     {

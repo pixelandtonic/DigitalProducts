@@ -10,6 +10,10 @@ namespace Craft;
 
 class DigitalProducts_LicensesController extends BaseController
 {
+
+    /**
+     * @inheritDoc BaseController::init()
+     */
     public function init()
     {
         if (!craft()->userSession->checkPermission('digitalProducts-manageLicenses')) {
@@ -19,23 +23,19 @@ class DigitalProducts_LicensesController extends BaseController
     }
 
     /**
-     * Create/Edit Product Type
+     * Create or edit a License
      *
      * @param array $variables
-     *
-     * @throws HttpException
      */
     public function actionEdit(array $variables = [])
     {
-        if (empty($variables['license']))
-        {
+        if (empty($variables['license'])) {
             if (empty($variables['licenseId'])) {
                 $license = new DigitalProducts_LicenseModel();
             } else {
                 $license = craft()->digitalProducts_licenses->getLicenseById($variables['licenseId']);
 
-                if (!$license)
-                {
+                if (!$license) {
                     $license = new DigitalProducts_LicenseModel();;
                 }
             }
@@ -43,42 +43,36 @@ class DigitalProducts_LicensesController extends BaseController
             $variables['license'] = $license;
         }
 
-        $variables['title'] = empty($license->id) ? Craft::t("Create a new License") : (string) $license;
+        $variables['title'] = empty($variables['license']->id) ? Craft::t("Create a new License") : (string)$variables['license'];
 
         $variables['userElementType'] = craft()->elements->getElementType(ElementType::User);
         $variables['productElementType'] = craft()->elements->getElementType("DigitalProducts_Product");
-        
+
         $this->renderTemplate('digitalproducts/licenses/_edit', $variables);
     }
 
     /**
-     * @throws HttpException
+     * Save a License.
      */
     public function actionSave()
     {
-        if (!craft()->userSession->getUser()->can('commerce-manageOrders')) {
-            throw new HttpException(403, Craft::t('This action is not allowed for the current user.'));
-        }
-
         $this->requirePostRequest();
 
         $license = new DigitalProducts_LicenseModel();
 
         $productIds = craft()->request->getPost('product');
-        if (is_array($productIds) && !empty($productIds))
-        {
+        $userIds = craft()->request->getPost('licensee');
+
+        if (is_array($productIds) && !empty($productIds)) {
             $license->productId = reset($productIds);
         }
-        
 
-        $userIds = craft()->request->getPost('licensee');
-        if (is_array($userIds) && !empty($userIds))
-        {
+        if (is_array($userIds) && !empty($userIds)) {
             $license->userId = reset($userIds);
         }
-        
+
         $license->id = craft()->request->getPost('licenseId');
-        $license->enabled = (bool) craft()->request->getPost('enabled');
+        $license->enabled = (bool)craft()->request->getPost('enabled');
         $license->licenseeName = craft()->request->getPost('licenseeName');
         $license->licenseeEmail = craft()->request->getPost('licenseeEmail');
         $license->orderId = craft()->request->getPost('orderId');
@@ -98,7 +92,7 @@ class DigitalProducts_LicensesController extends BaseController
     }
 
     /**
-     * @throws HttpException
+     * Delete a License.
      */
     public function actionDelete()
     {

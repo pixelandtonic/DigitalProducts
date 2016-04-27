@@ -11,6 +11,8 @@ namespace Craft;
 class DigitalProductsVariable
 {
     /**
+     * Return all Product Types.
+     *
      * @param array
      *
      * @return array|null
@@ -21,16 +23,20 @@ class DigitalProductsVariable
     }
 
     /**
-     * @param array
+     * Get Licenses.
+     *
+     * @param array|null $criteria
      *
      * @return array|null
      */
-    public function getAllLicenses()
+    public function licenses($criteria = null)
     {
-        return craft()->digitalProducts_licenses->getLicenses();
+        return craft()->elements->getCriteria("DigitalProducts_License", $criteria);
     }
 
     /**
+     * Get Digital Products.
+     *
      * @param array|null $criteria
      *
      * @return ElementCriteriaModel

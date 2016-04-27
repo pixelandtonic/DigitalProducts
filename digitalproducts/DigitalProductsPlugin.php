@@ -19,7 +19,10 @@ class DigitalProductsPlugin extends BasePlugin
     public function init()
     {
         if (craft()->request->isCpRequest()) {
-            craft()->templates->hook('digitalProducts.prepCpTemplate', array($this, 'prepCpTemplate'));
+            craft()->templates->hook('digitalProducts.prepCpTemplate', [
+                $this,
+                'prepCpTemplate'
+            ]);
             $this->_includeCpResources();
         }
 
@@ -144,7 +147,7 @@ class DigitalProductsPlugin extends BasePlugin
      */
     public function prepCpTemplate(&$context)
     {
-        $context['subnav'] = array();
+        $context['subnav'] = [];
         $productTypes = craft()->digitalProducts_productTypes->getProductTypes();
 
         if (craft()->userSession->checkPermission('digitalProducts-manageProductTypes')) {
@@ -180,19 +183,22 @@ class DigitalProductsPlugin extends BasePlugin
     {
         $productTypes = craft()->digitalProducts_productTypes->getAllProductTypes('id');
 
-        $productTypePermissions = array();
+        $productTypePermissions = [];
         foreach ($productTypes as $id => $productType) {
-            $suffix = ':' . $id;
-            $productTypePermissions["digitalProducts-manageProductType" . $suffix] = array(
+            $suffix = ':'.$id;
+            $productTypePermissions["digitalProducts-manageProductType".$suffix] = [
                 'label' => Craft::t('“{type}” products', ['type' => $productType->name])
-            );
+            ];
         }
 
-        return array(
-            'digitalProducts-manageProductTypes' => array('label' => Craft::t('Manage product types')),
-            'digitalProducts-manageProducts' => array('label' => Craft::t('Manage products'), 'nested' => $productTypePermissions),
-            'digitalProducts-manageLicenses' => array('label' => Craft::t('Manage licenses'))
-        );
+        return [
+            'digitalProducts-manageProductTypes' => ['label' => Craft::t('Manage product types')],
+            'digitalProducts-manageProducts' => [
+                'label' => Craft::t('Manage products'),
+                'nested' => $productTypePermissions
+            ],
+            'digitalProducts-manageLicenses' => ['label' => Craft::t('Manage licenses')]
+        ];
     }
 
     /**
@@ -218,8 +224,17 @@ class DigitalProductsPlugin extends BasePlugin
      */
     private function _registerEventHandlers()
     {
-        craft()->on('commerce_orders.onOrderComplete', ['\Craft\DigitalProducts_LicensesService', 'handleCompletedOrder']);
-        craft()->on('users.onActivateUser', ['\Craft\DigitalProducts_LicensesService', 'handleUserActivation']);
-        craft()->on('commerce_payments.onBeforeGatewayRequestSend', ['\Craft\DigitalProducts_LicensesService', 'maybePreventPayment']);
+        craft()->on('commerce_orders.onOrderComplete', [
+            '\Craft\DigitalProducts_LicensesService',
+            'handleCompletedOrder'
+        ]);
+        craft()->on('users.onActivateUser', [
+            '\Craft\DigitalProducts_LicensesService',
+            'handleUserActivation'
+        ]);
+        craft()->on('commerce_payments.onBeforeGatewayRequestSend', [
+            '\Craft\DigitalProducts_LicensesService',
+            'maybePreventPayment'
+        ]);
     }
 }

@@ -4,16 +4,14 @@ namespace Craft;
 /**
  * Product record.
  *
- * @property string $slug
- * @property string $sku
- * @property float $price
- *
  * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @copyright Copyright (c) 2016, Pixel & Tonic, Inc.
  */
 class DigitalProducts_ProductRecord extends BaseRecord
 {
     /**
+     * @inheritdoc BaseRecord::getTableName()
+     *
      * @return string
      */
     public function getTableName()
@@ -22,6 +20,8 @@ class DigitalProducts_ProductRecord extends BaseRecord
     }
 
     /**
+     * @inheritdoc BaseRecord::defineIndexes()
+     *
      * @return array
      */
     public function defineIndexes()
@@ -32,6 +32,8 @@ class DigitalProducts_ProductRecord extends BaseRecord
     }
 
     /**
+     * @inheritdoc BaseRecord::defineRelations()
+     *
      * @return array
      */
     public function defineRelations()
@@ -58,6 +60,8 @@ class DigitalProducts_ProductRecord extends BaseRecord
     }
 
     /**
+     * @inheritdoc BaseRecord::defineAttributes()
+     *
      * @return array
      */
     protected function defineAttributes()
@@ -68,7 +72,7 @@ class DigitalProducts_ProductRecord extends BaseRecord
             'promotable' => AttributeType::Bool,
 
             'sku' => [AttributeType::String, 'required' => true],
-            'price' => [AttributeType::Number, 'decimals' => 4, 'required' => true],
+            'price' => [AttributeType::Number, 'decimals' => 4, 'required' => false],
         ];
     }
 }

@@ -10,6 +10,7 @@ namespace Craft;
  */
 class DigitalProducts_LicenseElementType extends BaseElementType
 {
+
     /**
      * @return null|string
      */
@@ -20,22 +21,8 @@ class DigitalProducts_LicenseElementType extends BaseElementType
     }
 
     /**
-     * @return bool
-     */
-    public function hasContent()
-    {
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasTitles()
-    {
-        return false;
-    }
-
-    /**
+     * @inheritDoc BaseElementType::hasStatuses()
+     *
      * @return bool
      */
     public function hasStatuses()
@@ -44,43 +31,26 @@ class DigitalProducts_LicenseElementType extends BaseElementType
     }
 
     /**
-     * @return bool
-     */
-    public function isLocalized()
-    {
-        return false;
-    }
-
-    /**
-     * @param null $source
+     * @inheritDoc BaseElementType::getSources()
      *
-     * @return array
-     */
-    public function getAvailableActions($source = null)
-    {
-        return [];
-    }
-
-    /**
      * @param null $context
      *
-     * @return array
+     * @return array|bool|false
      */
     public function getSources($context = null)
     {
         $productTypes = craft()->digitalProducts_productTypes->getProductTypes();
 
-        $productTypeIds = array();
+        $productTypeIds = [];
 
-        foreach ($productTypes as $productType)
-        {
+        foreach ($productTypes as $productType) {
             $productTypeIds[] = $productType->id;
         }
 
         $sources = [
             '*' => [
-                'label'       => Craft::t('All product types'),
-                'criteria'    => ['licenseIssueDate' => $productTypeIds],
+                'label' => Craft::t('All product types'),
+                'criteria' => ['licenseIssueDate' => $productTypeIds],
                 'defaultSort' => ['dateCreated', 'desc']
             ]
         ];
@@ -88,7 +58,7 @@ class DigitalProducts_LicenseElementType extends BaseElementType
         $sources[] = ['heading' => Craft::t('Digital Product Types')];
 
         foreach ($productTypes as $productType) {
-            $key = 'productType:' . $productType->id;
+            $key = 'productType:'.$productType->id;
 
             $sources[$key] = [
                 'label' => $productType->name,
@@ -100,12 +70,17 @@ class DigitalProducts_LicenseElementType extends BaseElementType
         }
 
         // Allow plugins to modify the sources
-        craft()->plugins->call('digitalProducts_modifyLicenseSources', [&$sources, $context]);
+        craft()->plugins->call('digitalProducts_modifyLicenseSources', [
+            &$sources,
+            $context
+        ]);
 
         return $sources;
     }
 
     /**
+     * @inheritDoc BaseElementType::defineAvailableTableAttributes()
+     *
      * @return array
      */
     public function defineAvailableTableAttributes()
@@ -119,10 +94,9 @@ class DigitalProducts_LicenseElementType extends BaseElementType
         ];
 
         // Allow plugins to modify the attributes
-        $pluginAttributes = craft()->plugins->call('digitalProducts_defineAdditionalLicenseTableAttributes', array(), true);
+        $pluginAttributes = craft()->plugins->call('digitalProducts_defineAdditionalLicenseTableAttributes', [], true);
 
-        foreach ($pluginAttributes as $thisPluginAttributes)
-        {
+        foreach ($pluginAttributes as $thisPluginAttributes) {
             $attributes = array_merge($attributes, $thisPluginAttributes);
         }
 
@@ -130,6 +104,8 @@ class DigitalProducts_LicenseElementType extends BaseElementType
     }
 
     /**
+     * @inheritDoc BaseElementType::getDefaultTableAttributes()
+     *
      * @param string|null $source
      *
      * @return array
@@ -152,6 +128,8 @@ class DigitalProducts_LicenseElementType extends BaseElementType
     }
 
     /**
+     * @inheritDoc BaseElementType::defineSearchableAttributes()
+     *
      * @return array
      */
     public function defineSearchableAttributes()
@@ -160,15 +138,20 @@ class DigitalProducts_LicenseElementType extends BaseElementType
     }
 
     /**
+     * @inheritDoc BaseElementType::getTableAttributeHtml()
+     *
      * @param BaseElementModel $element
-     * @param string $attribute
+     * @param string           $attribute
      *
      * @return mixed|string
      */
     public function getTableAttributeHtml(BaseElementModel $element, $attribute)
     {
         // First give plugins a chance to set this
-        $pluginAttributeHtml = craft()->plugins->callFirst('digitalProducts_getLicenseTableAttributeHtml', [$element, $attribute], true);
+        $pluginAttributeHtml = craft()->plugins->callFirst('digitalProducts_getLicenseTableAttributeHtml', [
+            $element,
+            $attribute
+        ], true);
 
         if ($pluginAttributeHtml !== null) {
             return $pluginAttributeHtml;
@@ -185,7 +168,8 @@ class DigitalProducts_LicenseElementType extends BaseElementType
 
             case 'orderLink': {
                 $url = $element->getOrderEditUrl();
-                return $url ? '<a href="' . $url . '">' . Craft::t('View order') . '</a>' : '';
+
+                return $url ? '<a href="'.$url.'">'.Craft::t('View order').'</a>' : '';
             }
 
             default: {
@@ -195,7 +179,7 @@ class DigitalProducts_LicenseElementType extends BaseElementType
     }
 
     /**
-     * Sortable by
+     * @inheritDoc BaseElementType::defineSortableAttributes()
      *
      * @return array
      */
@@ -212,8 +196,10 @@ class DigitalProducts_LicenseElementType extends BaseElementType
 
         return $attributes;
     }
-    
+
     /**
+     * @inheritDoc BaseElement::defineCriteriaAttributes()
+     *
      * @return array
      */
     public function defineCriteriaAttributes()
@@ -233,27 +219,30 @@ class DigitalProducts_LicenseElementType extends BaseElementType
             'before' => AttributeType::Bool,
             'after' => AttributeType::Bool,
 
-            'status' => [AttributeType::String, 'default' => DigitalProducts_ProductModel::LIVE],
+            'status' => [
+                AttributeType::String,
+                'default' => DigitalProducts_ProductModel::LIVE
+            ],
             'order' => [AttributeType::String, 'default' => 'dateCreated desc'],
         ];
     }
 
     /**
-     * @inheritDoc IElementType::getElementQueryStatusCondition()
+     * @inheritDoc BaseElementType::getElementQueryStatusCondition()
      *
      * @param DbCommand $query
-     * @param string $status
+     * @param string    $status
      *
      * @return array|false|string|void
      */
     public function getElementQueryStatusCondition(DbCommand $query, $status)
     {
         switch ($status) {
-            case BaseElementModel::ENABLED:  {
+            case BaseElementModel::ENABLED: {
                 return 'elements.enabled = 1';
             }
 
-            case BaseElementModel::DISABLED:  {
+            case BaseElementModel::DISABLED: {
                 return 'elements.enabled = 0';
             }
         }
@@ -261,10 +250,12 @@ class DigitalProducts_LicenseElementType extends BaseElementType
 
 
     /**
-     * @param DbCommand $query
+     * @inheritDoc BaseElementType::modifyElementsQuery()
+     *
+     * @param DbCommand            $query
      * @param ElementCriteriaModel $criteria
-     * @return bool
-     * @throws Exception
+     *
+     * @return false|null|void
      */
     public function modifyElementsQuery(DbCommand $query, ElementCriteriaModel $criteria)
     {
@@ -276,7 +267,11 @@ class DigitalProducts_LicenseElementType extends BaseElementType
             ->join('digitalproducts_producttypes producttypes', 'producttypes.id = products.typeId');
 
         if ($criteria->email) {
-            $query->andWhere(array('or', array('licenses.licenseeEmail = :email', 'users.email = :email'), array(':email' => $criteria->licensedEmail)));
+            $query->andWhere([
+                'or',
+                ['licenses.licenseeEmail = :email', 'users.email = :email'],
+                [':email' => $criteria->licensedEmail]
+            ]);
         }
 
         if ($criteria->licenseeEmail) {
@@ -313,18 +308,13 @@ class DigitalProducts_LicenseElementType extends BaseElementType
             $query->andWhere(DbHelper::parseParam('products.typeId', $criteria->typeId, $query->params));
         }
 
-        if ($criteria->licenseDate)
-        {
+        if ($criteria->licenseDate) {
             $query->andWhere(DbHelper::parseDateParam('licenses.dateCreated', $criteria->licenseDate, $query->params));
-        }
-        else
-        {
-            if ($criteria->after)
-            {
+        } else {
+            if ($criteria->after) {
                 $query->andWhere(DbHelper::parseDateParam('licenses.dateCreated', '>='.$criteria->after, $query->params));
             }
-            if ($criteria->before)
-            {
+            if ($criteria->before) {
                 $query->andWhere(DbHelper::parseDateParam('licenses.dateCreated', '<'.$criteria->before, $query->params));
             }
         }
@@ -332,11 +322,12 @@ class DigitalProducts_LicenseElementType extends BaseElementType
         return true;
     }
 
-
     /**
+     * @inheritDoc BaseElementType::populateElementModel()
+     *
      * @param array $row
      *
-     * @return BaseModel
+     * @return BaseElementModel|void
      */
     public function populateElementModel($row)
     {

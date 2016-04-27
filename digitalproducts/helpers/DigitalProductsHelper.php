@@ -1,5 +1,4 @@
 <?php
-
 namespace Craft;
 
 /**
@@ -23,8 +22,7 @@ class DigitalProductsHelper
     {
         $licenseKey = '';
 
-        for($i = 0; $i < $keyLength; $i++)
-        {
+        for ($i = 0; $i < $keyLength; $i++) {
             $licenseKey .= $codeAlphabet[mt_rand(0, strlen($codeAlphabet) - 1)];
         }
 

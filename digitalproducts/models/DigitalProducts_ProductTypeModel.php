@@ -24,7 +24,9 @@ class DigitalProducts_ProductTypeModel extends BaseModel
     }
 
     /**
-     * @return string
+     * @inheritDoc BaseElementModel::getCpEditUrl()
+     *
+     * @return string|false
      */
     public function getCpEditUrl()
     {
@@ -32,6 +34,8 @@ class DigitalProducts_ProductTypeModel extends BaseModel
     }
 
     /**
+     * Return locales defined for this Product by it's Product Type.
+     *
      * @return array
      */
     public function getLocales()
@@ -69,6 +73,8 @@ class DigitalProducts_ProductTypeModel extends BaseModel
     }
 
     /**
+     * @inheritdoc BaseModel::defineAttributes()
+     *             
      * @return array
      */
     protected function defineAttributes()

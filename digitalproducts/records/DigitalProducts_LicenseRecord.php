@@ -4,20 +4,14 @@ namespace Craft;
 /**
  * Product record.
  *
- * @property string $licenseKey
- * @property string $status
- * @property string $licenseeName
- * @property string $licenseeEmail
- * @property int $userId
- * @property int $orderId
- * @property int $productId
- *
  * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @copyright Copyright (c) 2016, Pixel & Tonic, Inc.
  */
 class DigitalProducts_LicenseRecord extends BaseRecord
 {
     /**
+     * @inheritdoc BaseRecord::getTableName()
+     *
      * @return string
      */
     public function getTableName()
@@ -26,6 +20,8 @@ class DigitalProducts_LicenseRecord extends BaseRecord
     }
 
     /**
+     * @inheritdoc BaseRecord::defineIndexes()
+     *
      * @return array
      */
     public function defineIndexes()
@@ -36,6 +32,8 @@ class DigitalProducts_LicenseRecord extends BaseRecord
     }
 
     /**
+     * @inheritdoc BaseRecord::defineRelations()
+     *
      * @return array
      */
     public function defineRelations()
@@ -58,6 +56,8 @@ class DigitalProducts_LicenseRecord extends BaseRecord
     }
 
     /**
+     * @inheritdoc BaseRecord::defineAttributes()
+     *
      * @return array
      */
     protected function defineAttributes()

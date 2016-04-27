@@ -10,7 +10,7 @@ namespace Craft;
 class DigitalProducts_LicensesService extends BaseApplicationComponent
 {
     /**
-     * Get a digital product by it's ID.
+     * Get a License by it's ID.
      *
      * @param int $id
      *
@@ -22,7 +22,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
     }
 
     /**
-     * Get licenses by criteria
+     * Get Licenses by criteria.
      *
      * @param array|ElementCriteriaModel $criteria
      *
@@ -38,11 +38,13 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
     }
 
     /**
+     * Save a License.
+     *
      * @param DigitalProducts_LicenseModel $license
      *
      * @return bool
-     * @throws Exception
-     * @throws \Exception
+     * @throws Exception in case of invalid data.
+     * @throws \Exception if saving of the Element failed causing a failed transaction
      */
     public function saveLicense(DigitalProducts_LicenseModel $license)
     {
@@ -70,6 +72,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
             $license->addError('licenseeEmail', Craft::t('A license must have either an email or a licensee assigned to it.'));
         }
 
+        // Assign license to a User if the email matches the User and User field left empty.
         if (
             (!craft()->config->exists('autoAssignUserOnPurchase', 'digitalProducts') || craft()->config->get('autoAssignUserOnPurchase', 'digitalProducts'))
             && empty($license->userId) && !empty($license->licenseeEmail) && $user = craft()->users->getUserByEmail($license->licenseeEmail)
@@ -156,7 +159,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
     }
 
     /**
-     * Sort trough the ordered items and generate licenses for digital products.
+     * Sort trough the ordered items and generate Licenses for Digital Products.
      *
      * @param Event $event
      */
@@ -192,8 +195,8 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
     }
 
     /**
-     * Prevent the order from taking place if the user is not logged in but the
-     * config require it and the order contains digital products.
+     * Prevent the Order from taking place if the user is not logged in but the
+     * config requires it and the Order contains Digital Products.
      *
      * @param Event $event
      */

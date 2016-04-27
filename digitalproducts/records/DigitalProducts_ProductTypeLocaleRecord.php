@@ -9,8 +9,6 @@ namespace Craft;
  */
 class DigitalProducts_ProductTypeLocaleRecord extends BaseRecord
 {
-    // Public Methods
-    // =========================================================================
 
     /**
      * @inheritDoc BaseRecord::getTableName()
@@ -46,9 +44,6 @@ class DigitalProducts_ProductTypeLocaleRecord extends BaseRecord
             ['columns' => ['productTypeId', 'locale'], 'unique' => true],
         ];
     }
-
-    // Protected Methods
-    // =========================================================================
 
     /**
      * @inheritDoc BaseRecord::defineAttributes()

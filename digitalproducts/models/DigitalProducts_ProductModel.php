@@ -35,7 +35,9 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     }
 
     /**
-     * @return null|string
+     * @inheritdoc BaseElementModel::getStatus()
+     *
+     * @return string|null
      */
     public function getStatus()
     {
@@ -68,6 +70,8 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     }
 
     /**
+     * @inheritdoc BaseElementModel::isEditable()
+     *
      * @return bool
      */
     public function isEditable()
@@ -92,6 +96,8 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
 
 
     /**
+     * @inheritdoc BaseElementModel::getCpEditUrl()
+     *
      * @return string
      */
     public function getCpEditUrl()
@@ -109,6 +115,8 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     }
 
     /**
+     * @inheritdoc BaseElementModel::getFieldLayout()
+     *
      * @return FieldLayoutModel|null
      */
     public function getFieldLayout()
@@ -122,7 +130,9 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
         return null;
     }
 
-    /*
+    /**
+     * @inheritdoc BaseElementModel::getUrlFormat()
+     *
      * Returns the URL format used to generate this element's URL.
      *
      * @return string
@@ -158,6 +168,8 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     }
 
     /**
+     * @inheritdoc BaseElementModel::defineAttributes()
+     *
      * @return array
      */
     protected function defineAttributes()
@@ -174,7 +186,9 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     }
 
     /**
-     * @inheritdoc
+     * @inheritdoc Purchasable::getPurchasableId()
+     *
+     * @return int
      */
     public function getPurchasableId()
     {
@@ -182,7 +196,9 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     }
 
     /**
-     * @inheritdoc
+     * @inheritdoc Purchasable::getSnapshot()
+     *
+     * @return array
      */
     public function getSnapshot()
     {
@@ -190,7 +206,9 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     }
 
     /**
-     * @inheritdoc
+     * @inheritdoc Purchasable::getPrice()
+     *
+     * @return float decimal(14,4)
      */
     public function getPrice()
     {
@@ -198,7 +216,9 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     }
 
     /**
-     * @inheritdoc
+     * @inheritdoc Purchasable::getSku()
+     *
+     * @return string
      */
     public function getSku()
     {
@@ -206,7 +226,9 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     }
 
     /**
-     * @inheritdoc
+     * @inheritdoc Purchasable::getDescription()
+     *
+     * @return string
      */
     public function getDescription()
     {
@@ -214,7 +236,9 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     }
 
     /**
-     * @inheritdoc
+     * @inheritdoc Purchasable::getTaxCategoryId()
+     *
+     * @return int
      */
     public function getTaxCategoryId()
     {
@@ -222,7 +246,11 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     }
 
     /**
-     * @inheritdoc
+     * @inheritdoc Purchasable::validateLineItem()
+     *
+     * @param \Craft\Commerce_LineItemModel $lineItem
+     *
+     * @return mixed
      */
     public function validateLineItem(\Craft\Commerce_LineItemModel $lineItem)
     {
@@ -230,7 +258,9 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     }
 
     /**
-     * @inheritdoc
+     * @inheritdoc Purchasable::hasFreeShipping()
+     *
+     * @return bool
      */
     public function hasFreeShipping()
     {
@@ -238,7 +268,9 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     }
 
     /**
-     * @inheritdoc
+     * @inheritdoc Purchasable::getIsPromotable()
+     *
+     * @return bool
      */
     public function getIsPromotable()
     {
