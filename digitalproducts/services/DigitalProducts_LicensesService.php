@@ -74,7 +74,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
 
         // Assign license to a User if the email matches the User and User field left empty.
         if (
-            (!craft()->config->exists('autoAssignUserOnPurchase', 'digitalProducts') || craft()->config->get('autoAssignUserOnPurchase', 'digitalProducts'))
+            (craft()->config->get('autoAssignUserOnPurchase', 'digitalProducts'))
             && empty($license->userId) && !empty($license->licenseeEmail) && $user = craft()->users->getUserByEmail($license->licenseeEmail)
         ) {
             $license->userId = $user->id;
@@ -254,7 +254,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
             return;
         }
 
-        if (craft()->config->exists('autoAssignLicensesOnUserRegistration', 'digitalProducts') && !craft()->config->get('autoAssignLicensesOnUserRegistration', 'digitalProducts')) {
+        if (!craft()->config->get('autoAssignLicensesOnUserRegistration', 'digitalProducts')) {
             return;
         }
 
