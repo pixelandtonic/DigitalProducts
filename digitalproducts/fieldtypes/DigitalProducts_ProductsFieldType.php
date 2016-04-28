@@ -19,6 +19,9 @@ class DigitalProducts_ProductsFieldType extends BaseElementFieldType
      */
     protected $elementType = 'DigitalProducts_Product';
 
+    // Public Methods
+    // =========================================================================
+
     /**
      * @inheritDoc BaseElementFieldType::getName()
      *

@@ -24,6 +24,9 @@ class DigitalProducts_LicenseModel extends BaseElementModel
      */
     protected $elementType = 'DigitalProducts_License';
 
+    // Public Methods
+    // =========================================================================
+
     /**
      * @return null|string
      */
@@ -129,6 +132,9 @@ class DigitalProducts_LicenseModel extends BaseElementModel
             parent::setEagerLoadedElements($handle, $elements);
         }
     }
+
+    // Protected Methods
+    // =========================================================================
 
     /**
      * @inheritDoc BaseElementModel::defineAttributes()

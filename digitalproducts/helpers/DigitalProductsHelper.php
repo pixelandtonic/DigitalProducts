@@ -10,7 +10,7 @@ namespace Craft;
 class DigitalProductsHelper
 {
 
-    // Methods
+    // Public Methods
     // =========================================================================
 
     /**

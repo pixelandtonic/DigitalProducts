@@ -15,6 +15,9 @@ class DigitalProducts_ProductTypeModel extends BaseModel
      */
     private $_locales;
 
+    // Public Methods
+    // =========================================================================
+
     /**
      * @return null|string
      */
@@ -71,6 +74,9 @@ class DigitalProducts_ProductTypeModel extends BaseModel
                 'fieldLayoutId'),
         ];
     }
+
+    // Protected Methods
+    // =========================================================================
 
     /**
      * @inheritdoc BaseModel::defineAttributes()

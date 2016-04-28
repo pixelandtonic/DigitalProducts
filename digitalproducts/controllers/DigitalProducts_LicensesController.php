@@ -22,6 +22,9 @@ class DigitalProducts_LicensesController extends BaseController
         parent::init();
     }
 
+    // Public Methods
+    // =========================================================================
+
     /**
      * Create or edit a License
      *

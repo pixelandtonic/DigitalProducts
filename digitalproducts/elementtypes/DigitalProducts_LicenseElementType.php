@@ -11,6 +11,9 @@ namespace Craft;
 class DigitalProducts_LicenseElementType extends BaseElementType
 {
 
+    // Public Methods
+    // =========================================================================
+
     /**
      * @return null|string
      */

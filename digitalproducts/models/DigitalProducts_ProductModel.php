@@ -26,6 +26,9 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
      */
     private $_productType;
 
+    // Public Methods
+    // =========================================================================
+
     /**
      * @return null|string
      */
@@ -168,24 +171,6 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     }
 
     /**
-     * @inheritdoc BaseElementModel::defineAttributes()
-     *
-     * @return array
-     */
-    protected function defineAttributes()
-    {
-        return array_merge(parent::defineAttributes(), [
-            'postDate' => AttributeType::DateTime,
-            'expiryDate' => AttributeType::DateTime,
-            'promotable' => [AttributeType::Bool,'default'=>true],
-            'typeId' => AttributeType::Number,
-            'sku' => AttributeType::String,
-            'taxCategoryId' => AttributeType::Number,
-            'price' => [AttributeType::Number, 'decimals' => 4],
-        ]);
-    }
-
-    /**
      * @inheritdoc Purchasable::getPurchasableId()
      *
      * @return int
@@ -277,5 +262,24 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
         return $this->getAttribute('promotable');
     }
 
+    // Protected Methods
+    // =========================================================================
 
+    /**
+     * @inheritdoc BaseElementModel::defineAttributes()
+     *
+     * @return array
+     */
+    protected function defineAttributes()
+    {
+        return array_merge(parent::defineAttributes(), [
+            'postDate' => AttributeType::DateTime,
+            'expiryDate' => AttributeType::DateTime,
+            'promotable' => [AttributeType::Bool,'default'=>true],
+            'typeId' => AttributeType::Number,
+            'sku' => AttributeType::String,
+            'taxCategoryId' => AttributeType::Number,
+            'price' => [AttributeType::Number, 'decimals' => 4],
+        ]);
+    }
 }

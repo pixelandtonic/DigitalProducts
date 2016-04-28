@@ -15,6 +15,9 @@ class DigitalProducts_ProductsController extends BaseController
      */
     protected $allowAnonymous = ['actionViewSharedProduct'];
 
+    // Public Methods
+    // =========================================================================
+
     /**
      * Index of digital products
      */
@@ -184,6 +187,9 @@ class DigitalProducts_ProductsController extends BaseController
 
         $this->_showProduct($product);
     }
+
+    // Private Methods
+    // =========================================================================
 
     /**
      * Displays a product.

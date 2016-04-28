@@ -29,6 +29,9 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
      */
     private $_editableProductTypeIds;
 
+    // Public Methods
+    // =========================================================================
+
     /**
      * Get Product Types.
      *

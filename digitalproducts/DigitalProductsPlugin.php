@@ -13,6 +13,9 @@ class DigitalProductsPlugin extends BasePlugin
 {
     public $handle = 'digitalProducts';
 
+    // Public Methods
+    // =========================================================================
+
     /**
      * Initialize the plugin.
      */
@@ -208,6 +211,9 @@ class DigitalProductsPlugin extends BasePlugin
     {
         return false;
     }
+
+    // Private Methods
+    // =========================================================================
 
     /**
      * Includes front end resources for Control Panel requests.

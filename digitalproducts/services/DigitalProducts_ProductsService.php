@@ -9,6 +9,9 @@ namespace Craft;
  */
 class DigitalProducts_ProductsService extends BaseApplicationComponent
 {
+    // Public Methods
+    // =========================================================================
+
     /**
      * Get a Digital Product by it's ID.
      *

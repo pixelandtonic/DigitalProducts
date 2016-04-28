@@ -9,6 +9,10 @@ namespace Craft;
  */
 class DigitalProducts_ProductRecord extends BaseRecord
 {
+
+    // Public Methods
+    // =========================================================================
+
     /**
      * @inheritdoc BaseRecord::getTableName()
      *
@@ -58,6 +62,9 @@ class DigitalProducts_ProductRecord extends BaseRecord
             ],
         ];
     }
+
+    // Protected Methods
+    // =========================================================================
 
     /**
      * @inheritdoc BaseRecord::defineAttributes()

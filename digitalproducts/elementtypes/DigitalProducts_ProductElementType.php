@@ -13,6 +13,10 @@ namespace Craft;
  */
 class DigitalProducts_ProductElementType extends BaseElementType
 {
+
+    // Public Methods
+    // =========================================================================
+
     /**
      * @return null|string
      */

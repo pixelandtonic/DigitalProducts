@@ -11,6 +11,9 @@ namespace Craft;
 class DigitalProducts_ProductTypesController extends BaseController
 {
 
+    // Public Methods
+    // =========================================================================
+
     /**
      * @inheritDoc BaseController::init()
      */

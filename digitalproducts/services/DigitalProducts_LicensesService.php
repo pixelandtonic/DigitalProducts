@@ -9,6 +9,9 @@ namespace Craft;
  */
 class DigitalProducts_LicensesService extends BaseApplicationComponent
 {
+    // Public Methods
+    // =========================================================================
+
     /**
      * Get a License by it's ID.
      *
