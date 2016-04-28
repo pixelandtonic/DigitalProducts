@@ -107,8 +107,11 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         }
 
         if (!$record->id) {
-            // TODO should we check if this will not clash with the index?
-            $record->licenseKey = DigitalProductsHelper::generateLicenseKey($productType->licenseKeyAlphabet, $productType->licenseKeyLength);
+            do {
+                $licenseKey = DigitalProductsHelper::generateLicenseKey($productType->licenseKeyAlphabet, $productType->licenseKeyLength);
+                $conflict = DigitalProducts_LicenseRecord::model()->findAllByAttributes(['licenseKey' => $licenseKey]);
+            } while ($conflict);
+            $record->licenseKey = $licenseKey;
         }
 
         $record->validate();
@@ -211,14 +214,13 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         }
 
         /**
-         * @var Commerce_OrderModel $order
+         * @var Commerce_OrderModel       $order
          * @var Commerce_TransactionModel $transaction
          */
         $transaction = $event->params['transaction'];
         $order = $transaction->order;
 
-        if (!$order)
-        {
+        if (!$order) {
             return;
         }
 
@@ -234,6 +236,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
             if ($element->getElementType() == "DigitalProducts_Product") {
                 $transaction->message = Craft::t("You must be logged in to complete this transaction!");
                 $event->performAction = false;
+
                 return;
             }
         }
