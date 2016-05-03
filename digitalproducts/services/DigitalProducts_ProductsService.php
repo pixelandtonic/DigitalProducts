@@ -98,6 +98,9 @@ class DigitalProducts_ProductsService extends BaseApplicationComponent
         $transaction = craft()->db->getCurrentTransaction() === null ? craft()->db->beginTransaction() : null;
 
         try {
+            $event = new Event($this, ['product' => $product]);
+            $this->onBeforeSaveDigitalProduct($event);
+
             $success = craft()->commerce_purchasables->saveElement($product);
 
             if (!$success) {
@@ -114,6 +117,9 @@ class DigitalProducts_ProductsService extends BaseApplicationComponent
             if ($transaction !== null) {
                 $transaction->commit();
             }
+
+            $event = new Event($this, ['product' => $product]);
+            $this->onSaveDigitalProduct($event);
         } catch (\Exception $e) {
             if ($transaction !== null) {
                 $transaction->rollback();
@@ -139,9 +145,33 @@ class DigitalProducts_ProductsService extends BaseApplicationComponent
         if ($product) {
             if (craft()->elements->deleteElementById($product->id)) {
                 return true;
-            } else {
-                return false;
             }
         }
+        return false;
     }
+
+    /**
+     * Event method
+     *
+     * @param Event $event
+     *
+     * @throws \CException
+     */
+    public function onBeforeSaveDigitalProduct(Event $event)
+    {
+        $this->raiseEvent('onBeforeSaveDigitalProduct', $event);
+    }
+
+    /**
+     * Event method
+     *
+     * @param Event $event
+     *
+     * @throws \CException
+     */
+    public function onSaveDigitalProduct(Event $event)
+    {
+        $this->raiseEvent('onSaveDigitalProduct', $event);
+    }
+
 }
