@@ -89,11 +89,11 @@ class DigitalProducts_LicenseElementType extends BaseElementType
     public function defineAvailableTableAttributes()
     {
         $attributes = [
-            'product' => ['label' => Craft::t('Licensed product')],
-            'productType' => ['label' => Craft::t('Product type')],
-            'dateCreated' => ['label' => Craft::t('License issue date')],
-            'licensedTo' => ['label' => Craft::t('Licensed to')],
-            'orderLink' => ['label' => Craft::t('Associated order')]
+            'product' => ['label' => Craft::t('Licensed Product')],
+            'productType' => ['label' => Craft::t('Product Type')],
+            'dateCreated' => ['label' => Craft::t('License Issue Date')],
+            'licensedTo' => ['label' => Craft::t('Licensed To')],
+            'orderLink' => ['label' => Craft::t('Associated Order')]
         ];
 
         // Allow plugins to modify the attributes
@@ -190,7 +190,7 @@ class DigitalProducts_LicenseElementType extends BaseElementType
     {
         $attributes = [
             'slug' => Craft::t('Product name'),
-            'licensedTo' => Craft::t('Licensee'),
+            'licensedTo' => Craft::t('Owner'),
             'licenseDate' => Craft::t('License date'),
         ];
 
@@ -209,7 +209,7 @@ class DigitalProducts_LicenseElementType extends BaseElementType
     {
         return [
             'email' => AttributeType::String,
-            'licenseeEmail' => AttributeType::String,
+            'ownerEmail' => AttributeType::String,
             'userEmail' => AttributeType::String,
 
             'user' => AttributeType::Mixed,
@@ -263,7 +263,7 @@ class DigitalProducts_LicenseElementType extends BaseElementType
     public function modifyElementsQuery(DbCommand $query, ElementCriteriaModel $criteria)
     {
         $query
-            ->addSelect("licenses.id, licenses.productId, licenses.licenseKey, licenses.licenseeName, licenses.licenseeEmail, licenses.userId, licenses.orderId, products.typeId as productTypeId")
+            ->addSelect("licenses.id, licenses.productId, licenses.licenseKey, licenses.ownerName, licenses.ownerEmail, licenses.userId, licenses.orderId, products.typeId as productTypeId")
             ->join('digitalproducts_licenses licenses', 'licenses.id = elements.id')
             ->join('digitalproducts_products products', 'products.id = licenses.productId')
             ->leftJoin('users users', 'users.id = licenses.userId')
@@ -272,13 +272,13 @@ class DigitalProducts_LicenseElementType extends BaseElementType
         if ($criteria->email) {
             $query->andWhere([
                 'or',
-                ['licenses.licenseeEmail = :email', 'users.email = :email'],
+                ['licenses.ownerEmail = :email', 'users.email = :email'],
                 [':email' => $criteria->licensedEmail]
             ]);
         }
 
-        if ($criteria->licenseeEmail) {
-            $query->andWhere(DbHelper::parseParam('licenses.licenseeEmail', $criteria->licenseeEmail, $query->params));
+        if ($criteria->ownerEmail) {
+            $query->andWhere(DbHelper::parseParam('licenses.ownerEmail', $criteria->ownerEmail, $query->params));
         }
 
         if ($criteria->userEmail) {

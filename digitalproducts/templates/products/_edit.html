@@ -4,9 +4,8 @@
 {% set selectedSubnavItem = "products" %}
 
 {% set crumbs = [
-	{ label: "Products"|t, url: url('digitalProducts/products') },
+	{ label: "Digital Products"|t, url: url('digitalproducts/index') },
 	{ label: productType.name|t, url: url('digitalProducts/products/'~productType.handle) },
-	{ label: product.id ? product.title|t : 'New', url: url('digitalproducts/products/'~productType.handle~'/'~(product.id ?: 'new')) }
 ] %}
 
 {% set fullPageForm = true %}
@@ -61,8 +60,6 @@
 
 
 					</div>
-
-					{{ productFields.generalFields(product) }}
 
 				</div>
 			</div>
@@ -127,17 +124,18 @@
 				</div>
 
 				<div class="pane meta">
-					{{ productFields.pricingFields(product) }}
-				</div>
-				<div class="pane meta">
-
-					{{ productFields.behavioralMetaFields(product) }}
-
-				</div>
-
-				<div class="pane meta">
 					{{ productFields.generalMetaFields(product) }}
 				</div>
+
+				<div class="pane meta">
+					{{ productFields.behavioralMetaFields(product) }}
+				</div>
+
+				<div class="pane meta">
+					{{ productFields.generalFields(product) }}
+					{{ productFields.pricingFields(product) }}
+				</div>
+
 			</div>
 		</div>
 

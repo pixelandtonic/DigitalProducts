@@ -64,8 +64,6 @@ class DigitalProducts_ProductTypeRecord extends BaseRecord
         return [
             'name' => [AttributeType::Name, 'required' => true],
             'handle' => [AttributeType::Handle, 'required' => true],
-            'licenseKeyAlphabet' => [AttributeType::String, 'required' => true],
-            'licenseKeyLength' => [AttributeType::Number, 'required' => true, 'unsigned' => true],
             'hasUrls' => AttributeType::Bool,
             'urlFormat' => AttributeType::String,
             'skuFormat' => AttributeType::String,

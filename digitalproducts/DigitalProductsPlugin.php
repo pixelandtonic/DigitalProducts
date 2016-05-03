@@ -151,31 +151,26 @@ class DigitalProductsPlugin extends BasePlugin
     public function prepCpTemplate(&$context)
     {
         $context['subnav'] = [];
-        $productTypes = craft()->digitalProducts_productTypes->getProductTypes();
 
         if (craft()->userSession->checkPermission('digitalProducts-manageProductTypes')) {
             $context['subnav']['productTypes'] = [
-                'label' => Craft::t('Product types'),
+                'label' => Craft::t('Product Types'),
                 'url' => 'digitalproducts/producttypes'
             ];
         }
 
         if (craft()->userSession->checkPermission('digitalProducts-manageProducts')) {
-            if (!empty($productTypes)) {
-                $context['subnav']['products'] = [
-                    'label' => Craft::t('Products'),
-                    'url' => 'digitalproducts/products'
-                ];
-            }
+            $context['subnav']['products'] = [
+                'label' => Craft::t('Products'),
+                'url' => 'digitalproducts/products'
+            ];
         }
 
-        if (!empty($productTypes)) {
-            if (craft()->userSession->checkPermission('digitalProducts-manageLicenses')) {
-                $context['subnav']['licenses'] = [
-                    'label' => Craft::t('Licenses'),
-                    'url' => 'digitalproducts/licenses'
-                ];
-            }
+        if (craft()->userSession->checkPermission('digitalProducts-manageLicenses')) {
+            $context['subnav']['licenses'] = [
+                'label' => Craft::t('Licenses'),
+                'url' => 'digitalproducts/licenses'
+            ];
         }
     }
 

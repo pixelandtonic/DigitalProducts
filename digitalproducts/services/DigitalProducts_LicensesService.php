@@ -63,22 +63,22 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         }
 
         $record->enabled = $license->enabled;
-        $record->licenseeName = $license->licenseeName;
-        $record->licenseeEmail = $license->licenseeEmail;
+        $record->ownerName = $license->ownerName;
+        $record->ownerEmail = $license->ownerEmail;
 
         if (empty($license->productId)) {
             $license->addError('productId', Craft::t('{attribute} cannot be blank.', ['attribute' => 'Product']));
         }
 
-        if (empty($license->userId) && empty($license->licenseeEmail)) {
-            $license->addError('userId', Craft::t('A license must have either an email or a licensee assigned to it.'));
-            $license->addError('licenseeEmail', Craft::t('A license must have either an email or a licensee assigned to it.'));
+        if (empty($license->userId) && empty($license->ownerEmail)) {
+            $license->addError('userId', Craft::t('A license must have either an email or an owner assigned to it.'));
+            $license->addError('ownerEmail', Craft::t('A license must have either an email or an owner assigned to it.'));
         }
 
         // Assign license to a User if the email matches the User and User field left empty.
         if (
             (craft()->config->get('autoAssignUserOnPurchase', 'digitalProducts'))
-            && empty($license->userId) && !empty($license->licenseeEmail) && $user = craft()->users->getUserByEmail($license->licenseeEmail)
+            && empty($license->userId) && !empty($license->ownerEmail) && $user = craft()->users->getUserByEmail($license->ownerEmail)
         ) {
             $license->userId = $user->id;
         }
@@ -111,7 +111,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
 
         if (!$record->id) {
             do {
-                $licenseKey = DigitalProductsHelper::generateLicenseKey($productType->licenseKeyAlphabet, $productType->licenseKeyLength);
+                $licenseKey = DigitalProductsHelper::generateLicenseKey();
                 $conflict = DigitalProducts_LicenseRecord::model()->findAllByAttributes(['licenseKey' => $licenseKey]);
             } while ($conflict);
             $record->licenseKey = $licenseKey;
@@ -266,7 +266,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
          */
         $user = $event->params['user'];
         $email = $user->email;
-        $licenses = craft()->digitalProducts_licenses->getLicenses(['licenseeEmail' => $email]);
+        $licenses = craft()->digitalProducts_licenses->getLicenses(['ownerEmail' => $email]);
 
         /**
          * @var DigitalProducts_LicenseModel $license
@@ -297,11 +297,11 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         $customer = $order->getCustomer();
 
         if ($customer && $user = $customer->getUser()) {
-            $license->licenseeEmail = $user->email;
-            $license->licenseeName = $user->getName();
+            $license->ownerEmail = $user->email;
+            $license->ownerName = $user->getName();
             $license->userId = $user->id;
         } else {
-            $license->licenseeEmail = $customer->email;
+            $license->ownerEmail = $customer->email;
         }
 
         $license->enabled = 1;

@@ -192,8 +192,6 @@ class DigitalProducts_ProductTypesService extends BaseApplicationComponent
 
         $productTypeRecord->name = $productType->name;
         $productTypeRecord->handle = $productType->handle;
-        $productTypeRecord->licenseKeyAlphabet = $productType->licenseKeyAlphabet;
-        $productTypeRecord->licenseKeyLength = $productType->licenseKeyLength;
         $productTypeRecord->hasUrls = $productType->hasUrls;
         $productTypeRecord->skuFormat = $productType->skuFormat;
         $productTypeRecord->template = $productType->template;

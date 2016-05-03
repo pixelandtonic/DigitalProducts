@@ -18,8 +18,11 @@ class DigitalProductsHelper
      *
      * @return string
      */
-    public static function generateLicenseKey($codeAlphabet, $keyLength)
+    public static function generateLicenseKey()
     {
+        $codeAlphabet = craft()->config->get('licenseKeyAlphabet', 'digitalProducts');
+        $keyLength = craft()->config->get('licenseKeyLength', 'digitalProducts');
+
         $licenseKey = '';
 
         for ($i = 0; $i < $keyLength; $i++) {

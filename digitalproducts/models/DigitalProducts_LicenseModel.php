@@ -48,7 +48,7 @@ class DigitalProducts_LicenseModel extends BaseElementModel
             if (!empty($this->userId) && $user = craft()->users->getUserById($this->userId)) {
                 $this->_licensedTo = $user->email;
             } else {
-                $this->_licensedTo = $this->licenseeEmail;
+                $this->_licensedTo = $this->ownerEmail;
             }
         }
 
@@ -147,8 +147,8 @@ class DigitalProducts_LicenseModel extends BaseElementModel
             'id' => AttributeType::Number,
             'productId' => AttributeType::Number,
             'licenseKey' => AttributeType::String,
-            'licenseeName' => AttributeType::String,
-            'licenseeEmail' => AttributeType::String,
+            'ownerName' => AttributeType::String,
+            'ownerEmail' => AttributeType::String,
             'userId' => AttributeType::Number,
             'orderId' => AttributeType::Number,
             'dateCreated' => AttributeType::DateTime,

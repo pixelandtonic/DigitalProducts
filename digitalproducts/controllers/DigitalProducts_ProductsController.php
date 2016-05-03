@@ -323,7 +323,7 @@ class DigitalProducts_ProductsController extends BaseController
         if (!empty($variables['product']->id)) {
             $variables['title'] = $variables['product']->title;
         } else {
-            $variables['title'] = Craft::t('Create a new product').' - '.$variables['productType']->name;
+            $variables['title'] = Craft::t('Create a new product');
         }
 
         $variables['continueEditingUrl'] = "digitalproducts/products/".$variables['productType']->handle."/{id}".

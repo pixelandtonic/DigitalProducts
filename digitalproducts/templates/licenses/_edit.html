@@ -17,7 +17,8 @@
 		{{ forms.elementSelectField({
 			elementType: productElementType,
 			elements: license.productId ? craft.digitalProducts.products.id(license.productId).find() : null,
-			label: "The digital product"|t,
+			instructions: "The digital product that this license should be associated with"|t,
+			label: "Product"|t,
 			id: 'product',
 			errors: license.getErrors('productId'),
 			class: 'ltr',
@@ -47,37 +48,37 @@
 		}) }}
 
 		{{ forms.textField({
-			label: "Licensee's Name"|t,
-			id: 'licenseeName',
+			label: "Owner Name"|t,
+			id: 'ownerName',
 			class: 'ltr',
-			name: 'licenseeName',
-			value: license.licenseeName,
-			errors: license.getErrors('licenseeName'),
+			name: 'ownerName',
+			value: license.ownerName,
+			errors: license.getErrors('ownerName'),
 			required: true
 		}) }}
 
 		{{ forms.textField({
-			label: "Licensee's Email"|t,
-			id: 'licenseeEmail',
+			label: "Owner Email"|t,
+			id: 'ownerEmail',
 			class: 'ltr',
-			name: 'licenseeEmail',
-			value: license.licenseeEmail,
-			errors: license.getErrors('licenseeEmail'),
+			name: 'ownerEmail',
+			value: license.ownerEmail,
+			errors: license.getErrors('ownerEmail'),
 			required: true,
-			instructions: "Required, if Licensee field is blank."|t,
+			instructions: "Required, if Owner field is blank."|t,
 		}) }}
 
 		{{ forms.elementSelectField({
 			elementType: userElementType,
 			elements: license.userId ? craft.users.id(license.userId).find() : null,
-			label: "Licensee"|t,
-			id: 'licensee',
+			label: "Owner"|t,
+			id: 'owner',
 			class: 'ltr',
-			name: 'licensee',
+			name: 'owner',
 			limit: 1,
 			errors: license.getErrors('userId'),
 			required: true,
-			instructions: "Required, if Licensee's Email field is blank."|t
+			instructions: "Required, if Owner Email field is blank."|t
 		}) }}
 	</div>
 

@@ -62,8 +62,6 @@ class DigitalProducts_ProductTypesController extends BaseController
         $productType->id = craft()->request->getPost('productTypeId');
         $productType->name = craft()->request->getPost('name');
         $productType->handle = craft()->request->getPost('handle');
-        $productType->licenseKeyAlphabet = craft()->request->getPost('licenseKeyAlphabet');
-        $productType->licenseKeyLength = craft()->request->getPost('licenseKeyLength');
         $productType->hasUrls = craft()->request->getPost('hasUrls');
         $productType->skuFormat = craft()->request->getPost('skuFormat');
         $productType->template = craft()->request->getPost('template');

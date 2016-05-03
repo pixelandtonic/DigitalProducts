@@ -77,7 +77,6 @@
 		required: true,
 		name: 'sku',
 		value: product.sku,
-		instructions: 'If left empty the format "{skuFormat}" will be used.'|t({skuFormat: product.getProductType().skuFormat}),
 		placeholder: 'Enter SKU'|t,
 		errors: product.getErrors('sku')
 	}) }}

@@ -4,12 +4,12 @@
 
 {% set tabs = {
 	productTypeSettings: { label: "Settings"|t, url: '#product-type-settings' },
-	productFields:       { label: "Product fields"|t, url: '#product-fields' },
+	productFields:       { label: "Product Fields"|t, url: '#product-fields' },
 } %}
 
 {% set crumbs = [
-	{ label: "Digital product types"|t, url: url('digitalproducts/producttypes/index') },
-	{ label: productType.id ? productType.name|t : 'New', url: url('digitalproducts/producttypes/'~(productType.id ?: 'new')) }
+	{ label: "Digital Products"|t, url: url('digitalproducts/index') },
+	{ label: "Product Types"|t, url: url('digitalproducts/producttypes/index') }
 ] %}
 
 {% set fullPageForm = true %}
@@ -55,27 +55,6 @@
 			name: 'skuFormat',
 			value: productType.skuFormat,
 			errors: productType.getErrors('skuFormat')
-		}) }}
-
-		{{ forms.textField({
-			label: "License key alphabet"|t,
-			instructions: "What characters should the license key use."|t,
-			id: 'licenseKeyAlphabet',
-			class: 'ltr',
-			name: 'licenseKeyAlphabet',
-			value: productType.licenseKeyAlphabet ? productType.licenseKeyAlphabet : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-			errors: productType.getErrors('licenseKeyAlphabet'),
-			required: true,
-		}) }}
-
-		{{ forms.textField({
-			label: "License key length"|t,
-			instructions: "Length of the generated license key."|t,
-			id: 'licenseKeyLength',
-			class: 'ltr',
-			name: 'licenseKeyLength',
-			value: productType.licenseKeyLength ? productType.licenseKeyLength : 128,
-			errors: productType.getErrors('licenseKeyLength')
 		}) }}
 
 		{% macro hasUrlsField(productType) %}
@@ -129,27 +108,27 @@
 			{% endmacro %}
 
 			{% set urlFormatInput %}
-				<table class="data fullwidth">
-					<thead>
-					{% if craft.isLocalized() %}
-						<th></th>
-					{% endif %}
-					<th scope="col">{{ "Product Type"|t }}</th>
-					</thead>
-					<tbody>
-					{% for locale in craft.i18n.getSiteLocales() %}
-						<tr>
-							{% if craft.isLocalized() %}
-								<th class="thin nowrap">{{ locale.id }}</th>
-							{% endif %}
-							<td class="topalign">
-								{% set value = (productType.locales[locale.id] is defined ? productType.locales[locale.id].urlFormat : null) %}
-								{{ _self.urlFormatText(locale, productType, 'urlFormat', value) }}
-							</td>
-						</tr>
-					{% endfor %}
-					</tbody>
-				</table>
+				{% if craft.isLocalized() %}
+					<table class="data fullwidth">
+						<tbody>
+							{% for locale in craft.i18n.getSiteLocales() %}
+								<tr>
+									{% if craft.isLocalized() %}
+										<th class="thin nowrap">{{ locale.id }}</th>
+									{% endif %}
+									<td class="topalign">
+										{% set value = (productType.locales[locale.id] is defined ? productType.locales[locale.id].urlFormat : null) %}
+										{{ _self.urlFormatText(locale, productType, 'urlFormat', value) }}
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				{% else %}
+					{% set locale = craft.i18n.getPrimarySiteLocale() %}
+					{% set value = (productType.locales[locale.id] is defined ? productType.locales[locale.id].urlFormat : null) %}
+					{{ _self.urlFormatText(locale, productType, 'urlFormat', value) }}
+				{% endif %}
 			{% endset %}
 
 			{{ forms.field({

@@ -64,7 +64,7 @@ class DigitalProducts_LicensesController extends BaseController
         $license = new DigitalProducts_LicenseModel();
 
         $productIds = craft()->request->getPost('product');
-        $userIds = craft()->request->getPost('licensee');
+        $userIds = craft()->request->getPost('owner');
 
         if (is_array($productIds) && !empty($productIds)) {
             $license->productId = reset($productIds);
@@ -76,8 +76,8 @@ class DigitalProducts_LicensesController extends BaseController
 
         $license->id = craft()->request->getPost('licenseId');
         $license->enabled = (bool)craft()->request->getPost('enabled');
-        $license->licenseeName = craft()->request->getPost('licenseeName');
-        $license->licenseeEmail = craft()->request->getPost('licenseeEmail');
+        $license->ownerName = craft()->request->getPost('ownerName');
+        $license->ownerEmail = craft()->request->getPost('ownerEmail');
         $license->orderId = craft()->request->getPost('orderId');
 
         // Save it

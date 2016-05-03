@@ -89,8 +89,6 @@ class DigitalProducts_ProductTypeModel extends BaseModel
             'id' => AttributeType::Number,
             'name' => AttributeType::Name,
             'handle' => AttributeType::Handle,
-            'licenseKeyAlphabet' => AttributeType::String,
-            'licenseKeyLength' => AttributeType::Number,
             'hasUrls' => AttributeType::Bool,
             'urlFormat' => AttributeType::String,
             'skuFormat' => AttributeType::String,
