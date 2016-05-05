@@ -20,6 +20,11 @@ class DigitalProducts_LicenseModel extends BaseElementModel
     private $_product = null;
 
     /**
+     * @var UserModel
+     */
+    private $_user = null;
+
+    /**
      * @var string
      */
     protected $elementType = 'DigitalProducts_License';
@@ -45,8 +50,12 @@ class DigitalProducts_LicenseModel extends BaseElementModel
         if (is_null($this->_licensedTo)) {
             $this->_licensedTo = "";
 
-            if (!empty($this->userId) && $user = craft()->users->getUserById($this->userId)) {
-                $this->_licensedTo = $user->email;
+            if (!empty($this->userId) && empty($this->_user)) {
+                $this->_user = craft()->users->getUserById($this->userId);
+            }
+
+            if (!empty($this->_user)) {
+                $this->_licensedTo = $this->_user->email;
             } else {
                 $this->_licensedTo = $this->ownerEmail;
             }
@@ -90,7 +99,7 @@ class DigitalProducts_LicenseModel extends BaseElementModel
      */
     public function getProductName()
     {
-        return (string)$this->getProduct();
+        return (string) $this->getProduct();
     }
 
     /**
@@ -127,10 +136,16 @@ class DigitalProducts_LicenseModel extends BaseElementModel
     public function setEagerLoadedElements($handle, $elements)
     {
         if ($handle == 'product') {
-            $this->_product = reset($elements);
-        } else {
-            parent::setEagerLoadedElements($handle, $elements);
+            $this->_product = isset($elements[0]) ? $elements[0] : null;
+            return;
         }
+
+        if ($handle == 'owner') {
+            $this->_user = isset($elements[0]) ? $elements[0] : null;
+            return;
+        }
+
+        parent::setEagerLoadedElements($handle, $elements);
     }
 
     // Protected Methods

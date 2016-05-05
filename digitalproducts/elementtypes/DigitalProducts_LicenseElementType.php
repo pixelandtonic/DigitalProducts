@@ -160,6 +160,9 @@ class DigitalProducts_LicenseElementType extends BaseElementType
             return $pluginAttributeHtml;
         }
 
+        /**
+         * @var DigitalProducts_LicenseModel $element
+         */
         switch ($attribute) {
             case 'productType': {
                 return $element->getProductType();
@@ -336,4 +339,90 @@ class DigitalProducts_LicenseElementType extends BaseElementType
     {
         return DigitalProducts_LicenseModel::populateModel($row);
     }
+
+    /**
+     * @inheritDoc IElementType::getEagerLoadingMap()
+     *
+     * @param BaseElementModel[]  $sourceElements
+     * @param string $handle
+     *
+     * @return array|false
+     */
+    public function getEagerLoadingMap($sourceElements, $handle)
+    {
+        if ($handle == 'product') {
+            // Get the source element IDs
+            $sourceElementIds = array();
+
+            foreach ($sourceElements as $sourceElement) {
+                $sourceElementIds[] = $sourceElement->id;
+            }
+
+            $map = craft()->db->createCommand()
+                ->select('id as source, productId as target')
+                ->from('digitalproducts_licenses')
+                ->where(array('in', 'id', $sourceElementIds))
+                ->queryAll();
+
+            return array(
+                'elementType' => 'DigitalProducts_Product',
+                'map' => $map
+            );
+        }
+
+        if ($handle == 'owner') {
+            // Get the source element IDs
+            $sourceElementIds = array();
+
+            foreach ($sourceElements as $sourceElement) {
+                $sourceElementIds[] = $sourceElement->id;
+            }
+
+            $map = craft()->db->createCommand()
+                ->select('id as source, userId as target')
+                ->from('digitalproducts_licenses')
+                ->where(array('in', 'id', $sourceElementIds))
+                ->queryAll();
+
+            return array(
+                'elementType' => 'User',
+                'map' => $map
+            );
+        }
+
+        return parent::getEagerLoadingMap($sourceElements, $handle);
+    }
+
+    // Protected methods
+    // =========================================================================
+
+    /**
+     * Preps the element criteria for a given table attribute
+     *
+     * @param ElementCriteriaModel $criteria
+     * @param string               $attribute
+     *
+     * @return void
+     */
+    protected function prepElementCriteriaForTableAttribute(ElementCriteriaModel $criteria, $attribute)
+    {
+        if ($attribute == 'product')
+        {
+            $with = $criteria->with ?: array();
+            $with[] = 'product';
+            $criteria->with = $with;
+            return;
+        }
+
+        if ($attribute == 'licensedTo')
+        {
+            $with = $criteria->with ?: array();
+            $with[] = 'owner';
+            $criteria->with = $with;
+            return;
+        }
+
+        parent::prepElementCriteriaForTableAttribute($criteria, $attribute);
+    }
+
 }
