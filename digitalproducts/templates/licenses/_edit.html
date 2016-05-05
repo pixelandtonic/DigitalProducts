@@ -47,6 +47,19 @@
 			errors: license.getErrors('skuFormat')
 		}) }}
 
+		{{ forms.elementSelectField({
+			elementType: userElementType,
+			elements: license.userId ? craft.users.id(license.userId).find() : null,
+			label: "Owner"|t,
+			id: 'owner',
+			class: 'ltr',
+			name: 'owner',
+			limit: 1,
+			errors: license.getErrors('userId'),
+			required: true,
+			instructions: "Required, if Owner Email field is blank."|t
+		}) }}
+
 		{{ forms.textField({
 			label: "Owner Name"|t,
 			id: 'ownerName',
@@ -66,19 +79,6 @@
 			errors: license.getErrors('ownerEmail'),
 			required: true,
 			instructions: "Required, if Owner field is blank."|t,
-		}) }}
-
-		{{ forms.elementSelectField({
-			elementType: userElementType,
-			elements: license.userId ? craft.users.id(license.userId).find() : null,
-			label: "Owner"|t,
-			id: 'owner',
-			class: 'ltr',
-			name: 'owner',
-			limit: 1,
-			errors: license.getErrors('userId'),
-			required: true,
-			instructions: "Required, if Owner Email field is blank."|t
 		}) }}
 	</div>
 
