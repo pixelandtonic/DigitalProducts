@@ -111,9 +111,15 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
 
         if (!$record->id) {
             do {
-                $licenseKey = DigitalProductsHelper::generateLicenseKey();
+                $licenseKey = $this->generateLicenseKey();
                 $conflict = DigitalProducts_LicenseRecord::model()->findAllByAttributes(['licenseKey' => $licenseKey]);
             } while ($conflict);
+
+            $modifiedLicenseKey = craft()->plugins->callFirst('digitalProducts_modifyLicenseKeyForLicense', array($licenseKey, $license), true);
+
+            // Use the plugin-modified name, if anyone was up to the task.
+            $licenseKey = $modifiedLicenseKey ?: $licenseKey;
+
             $record->licenseKey = $licenseKey;
         }
 
@@ -308,6 +314,25 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         $license->orderId = $order->id;
 
         return $this->saveLicense($license);
+    }
+
+    /**
+     * Generate a license key.
+     *
+     * @return string
+     */
+    public function generateLicenseKey()
+    {
+        $codeAlphabet = craft()->config->get('licenseKeyAlphabet', 'digitalProducts');
+        $keyLength = craft()->config->get('licenseKeyLength', 'digitalProducts');
+
+        $licenseKey = '';
+
+        for ($i = 0; $i < $keyLength; $i++) {
+            $licenseKey .= $codeAlphabet[mt_rand(0, strlen($codeAlphabet) - 1)];
+        }
+
+        return $licenseKey;
     }
 
     /**
