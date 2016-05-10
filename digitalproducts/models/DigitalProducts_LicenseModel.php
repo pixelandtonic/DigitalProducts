@@ -25,6 +25,11 @@ class DigitalProducts_LicenseModel extends BaseElementModel
     private $_user = null;
 
     /**
+     * @var Commerce_OrderModel
+     */
+    private $_order = null;
+
+    /**
      * @var string
      */
     protected $elementType = 'DigitalProducts_License';
@@ -76,6 +81,25 @@ class DigitalProducts_LicenseModel extends BaseElementModel
         }
 
         return $this->_product = craft()->digitalProducts_products->getProductById($this->productId);
+    }
+
+    /**
+     * Return the order tied to the license.
+     *
+     * @return bool|Commerce_OrderModel
+     */
+    public function getOrder()
+    {
+        if ($this->_order) {
+            return $this->_order;
+        }
+
+        if ($this->orderId)
+        {
+            return $this->_order = craft()->commerce_orders->getOrderById($this->orderId);
+        }
+
+        return false;
     }
 
     /**
@@ -142,6 +166,11 @@ class DigitalProducts_LicenseModel extends BaseElementModel
 
         if ($handle == 'owner') {
             $this->_user = isset($elements[0]) ? $elements[0] : null;
+            return;
+        }
+
+        if ($handle == 'order') {
+            $this->_order = isset($elements[0]) ? $elements[0] : null;
             return;
         }
 

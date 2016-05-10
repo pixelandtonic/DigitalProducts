@@ -370,6 +370,26 @@ class DigitalProducts_LicenseElementType extends BaseElementType
             );
         }
 
+        if ($handle == 'order') {
+            // Get the source element IDs
+            $sourceElementIds = array();
+
+            foreach ($sourceElements as $sourceElement) {
+                $sourceElementIds[] = $sourceElement->id;
+            }
+
+            $map = craft()->db->createCommand()
+                ->select('id as source, orderId as target')
+                ->from('digitalproducts_licenses')
+                ->where(array('in', 'id', $sourceElementIds))
+                ->queryAll();
+
+            return array(
+                'elementType' => 'Commerce_Order',
+                'map' => $map
+            );
+        }
+
         if ($handle == 'owner') {
             // Get the source element IDs
             $sourceElementIds = array();
