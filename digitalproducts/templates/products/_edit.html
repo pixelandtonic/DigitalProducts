@@ -32,7 +32,7 @@
 
 {% block main %}
 		<input type="hidden" name="action" value="digitalProducts/products/save">
-		<input type="hidden" name="redirect" value="digitalProducts/products">
+		<input type="hidden" name="redirect" value="digitalproducts/products">
 		<input type="hidden" name="typeId" value="{{ productType.id }}">
 		{% if craft.isLocalized() %}<input type="hidden" name="locale" value="{{ product.locale }}">{% endif %}
 		{{ getCsrfInput() }}
