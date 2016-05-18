@@ -218,6 +218,9 @@ class DigitalProducts_LicenseElementType extends BaseElementType
             'user' => AttributeType::Mixed,
             'userId' => AttributeType::Number,
 
+            'product' => AttributeType::Mixed,
+            'productId' => AttributeType::Number,
+
             'type' => AttributeType::Mixed,
             'typeId' => AttributeType::Number,
 
@@ -299,6 +302,19 @@ class DigitalProducts_LicenseElementType extends BaseElementType
 
         if ($criteria->userId) {
             $query->andWhere(DbHelper::parseParam('users.id', $criteria->userId, $query->params));
+        }
+
+        if ($criteria->product) {
+            if ($criteria->product instanceof DigitalProducts_ProductModel) {
+                $criteria->productId = $criteria->product->id;
+                $criteria->product = null;
+            } else {
+                $query->andWhere(DbHelper::parseParam('products.sku', $criteria->type, $query->params));
+            }
+        }
+
+        if ($criteria->productId) {
+            $query->andWhere(DbHelper::parseParam('products.id', $criteria->productId, $query->params));
         }
 
         if ($criteria->type) {
