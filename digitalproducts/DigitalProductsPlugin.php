@@ -152,17 +152,17 @@ class DigitalProductsPlugin extends BasePlugin
     {
         $context['subnav'] = [];
 
-        if (craft()->userSession->checkPermission('digitalProducts-manageProductTypes')) {
-            $context['subnav']['productTypes'] = [
-                'label' => Craft::t('Product Types'),
-                'url' => 'digitalproducts/producttypes'
-            ];
-        }
-
         if (craft()->userSession->checkPermission('digitalProducts-manageProducts')) {
             $context['subnav']['products'] = [
                 'label' => Craft::t('Products'),
                 'url' => 'digitalproducts/products'
+            ];
+        }
+
+        if (craft()->userSession->checkPermission('digitalProducts-manageProductTypes')) {
+            $context['subnav']['productTypes'] = [
+                'label' => Craft::t('Product Types'),
+                'url' => 'digitalproducts/producttypes'
             ];
         }
 
