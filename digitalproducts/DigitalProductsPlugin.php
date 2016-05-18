@@ -11,7 +11,6 @@ namespace Craft;
  */
 class DigitalProductsPlugin extends BasePlugin
 {
-    public $handle = 'digitalProducts';
 
     // Public Methods
     // =========================================================================
