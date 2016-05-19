@@ -88,6 +88,13 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
             return false;
         }
 
+        // If a owner is set, void the name and email fields.
+        if ($license->userId)
+        {
+            $record->ownerName = null;
+            $record->ownerEmail = null;
+        }
+
         $record->userId = $license->userId;
         $record->productId = $license->productId;
         $record->orderId = $license->orderId;
