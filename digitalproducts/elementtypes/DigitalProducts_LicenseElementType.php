@@ -229,12 +229,13 @@ class DigitalProducts_LicenseElementType extends BaseElementType
             'after' => AttributeType::Bool,
 
             'orderId' => AttributeType::Number,
+            'licenseKey' => AttributeType::String,
 
             'status' => [
                 AttributeType::String,
                 'default' => DigitalProducts_ProductModel::LIVE
             ],
-            
+
             'order' => [AttributeType::String, 'default' => 'dateCreated desc'],
         ];
     }
@@ -348,6 +349,11 @@ class DigitalProducts_LicenseElementType extends BaseElementType
         {
             $query->andWhere(DbHelper::parseParam('licenses.orderId', $criteria->orderId, $query->params));
         }
+
+        if ($criteria->licenseKey) {
+            $query->andWhere(DbHelper::parseParam('licenses.licenseKey', $criteria->licenseKey, $query->params));
+        }
+
 
         return true;
     }
