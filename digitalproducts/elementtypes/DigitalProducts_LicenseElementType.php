@@ -228,10 +228,13 @@ class DigitalProducts_LicenseElementType extends BaseElementType
             'before' => AttributeType::Bool,
             'after' => AttributeType::Bool,
 
+            'orderId' => AttributeType::Number,
+
             'status' => [
                 AttributeType::String,
                 'default' => DigitalProducts_ProductModel::LIVE
             ],
+            
             'order' => [AttributeType::String, 'default' => 'dateCreated desc'],
         ];
     }
@@ -339,6 +342,11 @@ class DigitalProducts_LicenseElementType extends BaseElementType
             if ($criteria->before) {
                 $query->andWhere(DbHelper::parseDateParam('licenses.dateCreated', '<'.$criteria->before, $query->params));
             }
+        }
+
+        if ($criteria->orderId)
+        {
+            $query->andWhere(DbHelper::parseParam('licenses.orderId', $criteria->orderId, $query->params));
         }
 
         return true;

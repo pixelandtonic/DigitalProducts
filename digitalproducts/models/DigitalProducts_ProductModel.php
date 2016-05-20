@@ -26,6 +26,11 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
      */
     private $_productType;
 
+    /**
+     * @var bool
+     */
+    private $_isLicensed;
+
     // Public Methods
     // =========================================================================
 
@@ -46,24 +51,17 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     {
         $status = parent::getStatus();
 
-        if ($status == static::ENABLED && $this->postDate)
-        {
+        if ($status == static::ENABLED && $this->postDate) {
             $currentTime = DateTimeHelper::currentTimeStamp();
             $postDate = $this->postDate->getTimestamp();
             $expiryDate = ($this->expiryDate ? $this->expiryDate->getTimestamp() : null);
 
-            if ($postDate <= $currentTime && (!$expiryDate || $expiryDate > $currentTime))
-            {
+            if ($postDate <= $currentTime && (!$expiryDate || $expiryDate > $currentTime)) {
                 return static::LIVE;
-            }
-            else
-            {
-                if ($postDate > $currentTime)
-                {
+            } else {
+                if ($postDate > $currentTime) {
                     return static::PENDING;
-                }
-                else
-                {
+                } else {
                     return static::EXPIRED;
                 }
             }
@@ -79,8 +77,7 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
      */
     public function isEditable()
     {
-        if ($this->getProductType())
-        {
+        if ($this->getProductType()) {
             $id = $this->getProductType()->id;
 
             return craft()->userSession->checkPermission('digitalProducts-manageProductType:'.$id);
@@ -88,7 +85,7 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
 
         return false;
     }
-    
+
     /**
      * @return bool
      */
@@ -107,12 +104,9 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     {
         $productType = $this->getProductType();
 
-        if ($productType)
-        {
-            return UrlHelper::getCpUrl('digitalproducts/products/' . $productType->handle . '/' . $this->id);
-        }
-        else
-        {
+        if ($productType) {
+            return UrlHelper::getCpUrl('digitalproducts/products/'.$productType->handle.'/'.$this->id);
+        } else {
             return null;
         }
     }
@@ -162,14 +156,53 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
      */
     public function getProductType()
     {
-        if ($this->_productType)
-        {
+        if ($this->_productType) {
             return $this->_productType;
         }
 
         return $this->_productType = craft()->digitalProducts_productTypes->getProductTypeById($this->typeId);
     }
 
+    /**
+     * Return true if the current user has a license for this product.
+     *
+     * @return bool
+     */
+    public function getIsLicensed()
+    {
+        if ($this->_isLicensed == null) {
+            $this->_isLicensed = false;
+            $user = craft()->userSession->getUser();
+            if ($user) {
+                $criteria = ['user' => $user, 'product' => $this];
+                $license = craft()->elements->getCriteria("DigitalProducts_License", $criteria)->first();
+
+                if ($license) {
+                    $this->_isLicensed = true;
+                }
+            }
+        }
+
+        return $this->_isLicensed;
+    }
+
+    /**
+     * @inheritdoc BaseElementModel::setEagerLoadedElements()
+     *
+     * @param string             $handle   The handle to load the elements with in the future
+     * @param BaseElementModel[] $elements The eager-loaded elements
+     */
+    public function setEagerLoadedElements($handle, $elements)
+    {
+        if ($handle == 'isLicensed') {
+            $this->_isLicensed = isset($elements[0]) ? true : false;
+            return;
+        }
+
+        parent::setEagerLoadedElements($handle, $elements);
+    }
+    // Implement Purchasable
+    // =========================================================================
     /**
      * @inheritdoc Purchasable::getPurchasableId()
      *
@@ -275,7 +308,7 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
         return array_merge(parent::defineAttributes(), [
             'postDate' => AttributeType::DateTime,
             'expiryDate' => AttributeType::DateTime,
-            'promotable' => [AttributeType::Bool,'default'=>true],
+            'promotable' => [AttributeType::Bool, 'default' => true],
             'typeId' => AttributeType::Number,
             'sku' => AttributeType::String,
             'taxCategoryId' => AttributeType::Number,

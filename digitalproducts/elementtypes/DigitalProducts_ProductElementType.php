@@ -473,4 +473,42 @@ class DigitalProducts_ProductElementType extends BaseElementType
 
         return false;
     }
+
+    /**
+     * @inheritDoc IElementType::getEagerLoadingMap()
+     *
+     * @param BaseElementModel[]  $sourceElements
+     * @param string $handle
+     *
+     * @return array|false
+     */
+    public function getEagerLoadingMap($sourceElements, $handle)
+    {
+        if ($handle == 'isLicensed') {
+            $user = craft()->userSession->getUser();
+            if ($user)
+            {
+                // Get the source element IDs
+                $sourceElementIds = array();
+
+                foreach ($sourceElements as $sourceElement) {
+                    $sourceElementIds[] = $sourceElement->id;
+                }
+
+                $map = craft()->db->createCommand()
+                    ->select('productId as source, id as target')
+                    ->from('digitalproducts_licenses')
+                    ->where(array('in', 'productId', $sourceElementIds))
+                    ->andWhere('userId = :currentUser', array(':currentUser' => $user->id))
+                    ->queryAll();
+
+                return array(
+                    'elementType' => 'DigitalProducts_License',
+                    'map' => $map
+                );
+            }
+        }
+        
+        return parent::getEagerLoadingMap($sourceElements, $handle);
+    }
 }
