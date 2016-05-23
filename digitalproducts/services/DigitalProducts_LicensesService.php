@@ -140,25 +140,25 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         $transaction = craft()->db->getCurrentTransaction() === null ? craft()->db->beginTransaction() : null;
 
         try {
-            $event = new Event($this, ['license' => $license]);
+            $event = new Event($this, ['license' => $license, 'isNewLicense' => !$license->id]);
             $this->onBeforeSaveLicense($event);
+
+            $success = false;
 
             if ($event->performAction) {
                 $success = craft()->elements->saveElement($license, false);
-
-                if (!$success) {
-                    if ($transaction !== null) {
-                        $transaction->rollback();
-                    }
-
-                    return false;
+            }
+            
+            if (!$success) {
+                if ($transaction !== null) {
+                    $transaction->rollback();
                 }
 
-                $record->id = $license->id;
-                $record->save(false);
-            } else {
                 return false;
             }
+
+            $record->id = $license->id;
+            $record->save(false);
 
             if ($transaction !== null) {
                 $transaction->commit();
@@ -166,6 +166,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
 
             $event = new Event($this, ['license' => $license]);
             $this->onSaveLicense($event);
+
         } catch (\Exception $e) {
             if ($transaction !== null) {
                 $transaction->rollback();

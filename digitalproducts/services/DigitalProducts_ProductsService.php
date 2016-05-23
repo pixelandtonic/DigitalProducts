@@ -98,10 +98,14 @@ class DigitalProducts_ProductsService extends BaseApplicationComponent
         $transaction = craft()->db->getCurrentTransaction() === null ? craft()->db->beginTransaction() : null;
 
         try {
-            $event = new Event($this, ['product' => $product]);
+            $event = new Event($this, ['product' => $product, 'isNewProduct' => !$product->id]);
             $this->onBeforeSaveDigitalProduct($event);
 
-            $success = craft()->commerce_purchasables->saveElement($product);
+            $success = false;
+            
+            if ($event->performAction) {
+                $success = craft()->commerce_purchasables->saveElement($product);
+            }
 
             if (!$success) {
                 if ($transaction !== null) {
@@ -113,6 +117,7 @@ class DigitalProducts_ProductsService extends BaseApplicationComponent
 
             $record->id = $product->id;
             $record->save(false);
+
 
             if ($transaction !== null) {
                 $transaction->commit();
