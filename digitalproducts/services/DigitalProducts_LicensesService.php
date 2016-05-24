@@ -96,25 +96,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         }
 
         $record->userId = $license->userId;
-        $record->productId = $license->productId;
         $record->orderId = $license->orderId;
-
-        /**
-         * @var $product DigitalProducts_ProductModel
-         */
-        $product = craft()->digitalProducts_products->getProductById($license->productId);
-
-        if (!$product) {
-            throw new Exception(Craft::t('No product exists with the ID “{id}”',
-                ['id' => $license->productId]));
-        }
-
-        $productType = $product->getProductType();
-
-        if (!$productType) {
-            throw new Exception(Craft::t('No product type exists with the ID “{id}”',
-                ['id' => $product->typeId]));
-        }
 
         if (!$record->id) {
             do {
@@ -128,6 +110,27 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
             $licenseKey = $modifiedLicenseKey ?: $licenseKey;
 
             $record->licenseKey = $licenseKey;
+
+            /**
+             * @var $product DigitalProducts_ProductModel
+             */
+            $product = craft()->digitalProducts_products->getProductById($license->productId);
+
+            if (!$product) {
+                throw new Exception(Craft::t('No product exists with the ID “{id}”',
+                    ['id' => $license->productId]));
+            }
+
+            $productType = $product->getProductType();
+
+            if (!$productType) {
+                throw new Exception(Craft::t('No product type exists with the ID “{id}”',
+                    ['id' => $product->typeId]));
+            }
+
+            $record->productId = $license->productId;
+        } else if ($record->productId != $license->productId) {
+            $license->addError('productId', Craft::t('The licensed product cannot be changed once a license has been created.'));
         }
 
         $record->validate();
