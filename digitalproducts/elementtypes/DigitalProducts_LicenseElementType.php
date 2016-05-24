@@ -215,8 +215,8 @@ class DigitalProducts_LicenseElementType extends BaseElementType
             'ownerEmail' => AttributeType::String,
             'userEmail' => AttributeType::String,
 
-            'user' => AttributeType::Mixed,
-            'userId' => AttributeType::Number,
+            'owner' => AttributeType::Mixed,
+            'ownerId' => AttributeType::Number,
 
             'product' => AttributeType::Mixed,
             'productId' => AttributeType::Number,
@@ -295,17 +295,17 @@ class DigitalProducts_LicenseElementType extends BaseElementType
             $query->andWhere(DbHelper::parseParam('users.email', $criteria->userEmail, $query->params));
         }
 
-        if ($criteria->user) {
-            if ($criteria->user instanceof UserModel) {
-                $criteria->userId = $criteria->user->id;
-                $criteria->user = null;
+        if ($criteria->owner) {
+            if ($criteria->owner instanceof UserModel) {
+                $criteria->ownerId = $criteria->owner->id;
+                $criteria->owner = null;
             } else {
-                $query->andWhere(DbHelper::parseParam('users.username', $criteria->user, $query->params));
+                $query->andWhere(DbHelper::parseParam('users.username', $criteria->owner, $query->params));
             }
         }
 
-        if ($criteria->userId) {
-            $query->andWhere(DbHelper::parseParam('users.id', $criteria->userId, $query->params));
+        if ($criteria->ownerId) {
+            $query->andWhere(DbHelper::parseParam('users.id', $criteria->ownerId, $query->params));
         }
 
         if ($criteria->product) {

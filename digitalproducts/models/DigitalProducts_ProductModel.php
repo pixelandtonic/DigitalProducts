@@ -174,7 +174,7 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
             $this->_isLicensed = false;
             $user = craft()->userSession->getUser();
             if ($user) {
-                $criteria = ['user' => $user, 'product' => $this];
+                $criteria = ['owner' => $user, 'product' => $this];
                 $license = craft()->elements->getCriteria("DigitalProducts_License", $criteria)->first();
 
                 if ($license) {
