@@ -78,7 +78,6 @@ class DigitalProducts_LicensesController extends BaseController
         $license->enabled = (bool)craft()->request->getPost('enabled');
         $license->ownerName = craft()->request->getPost('ownerName');
         $license->ownerEmail = craft()->request->getPost('ownerEmail');
-        $license->orderId = craft()->request->getPost('orderId');
 
         // Save it
         if (craft()->digitalProducts_licenses->saveLicense($license)) {

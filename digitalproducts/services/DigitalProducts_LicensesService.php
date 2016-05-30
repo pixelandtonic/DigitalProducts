@@ -96,7 +96,6 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         }
 
         $record->userId = $license->userId;
-        $record->orderId = $license->orderId;
 
         if (!$record->id) {
             do {
@@ -322,9 +321,14 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         }
 
         $license->enabled = 1;
-        $license->orderId = $order->id;
 
-        return $this->saveLicense($license);
+        $success = $this->saveLicense($license);
+
+        if ($success) {
+            return (bool)craft()->db->createCommand()->update('digitalproducts_licenses', ['orderId' => $order->id], ['id' => $license->id]);
+        }
+
+        return false;
     }
 
     /**
