@@ -146,13 +146,40 @@ class DigitalProducts_ProductsService extends BaseApplicationComponent
      */
     public function deleteProduct($product)
     {
-        $product = DigitalProducts_ProductRecord::model()->findById($product->id);
-        if ($product) {
-            if (craft()->elements->deleteElementById($product->id)) {
-                return true;
-            }
+        $event = new Event($this, ['product' => $product]);
+        $this->onBeforeDeleteDigitalProduct($event);
+
+        if ($event->performAction && craft()->elements->deleteElementById($product->id)) {
+            $event = new Event($this, ['product' => $product]);
+            $this->onDeleteDigitalProduct($event);
+            return true;
         }
+        
         return false;
+    }
+
+    /**
+     * Event method
+     *
+     * @param Event $event
+     *
+     * @throws \CException
+     */
+    public function onBeforeDeleteDigitalProduct(Event $event)
+    {
+        $this->raiseEvent('onBeforeDeleteDigitalProduct', $event);
+    }
+
+    /**
+     * Event method
+     *
+     * @param Event $event
+     *
+     * @throws \CException
+     */
+    public function onDeleteDigitalProduct(Event $event)
+    {
+        $this->raiseEvent('onDeleteDigitalProduct', $event);
     }
 
     /**
@@ -178,5 +205,4 @@ class DigitalProducts_ProductsService extends BaseApplicationComponent
     {
         $this->raiseEvent('onSaveDigitalProduct', $event);
     }
-
 }

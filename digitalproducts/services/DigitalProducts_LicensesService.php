@@ -66,7 +66,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         $record->ownerName = $license->ownerName;
         $record->ownerEmail = $license->ownerEmail;
 
-        if (empty($license->productId)) {
+        if (empty($license->productId) && empty($license->snapshot)) {
             $license->addError('productId', Craft::t('{attribute} cannot be blank.', ['attribute' => 'Product']));
         }
 
@@ -89,12 +89,12 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         }
 
         // If a owner is set, void the name and email fields.
-        if ($license->userId)
-        {
+        if ($license->userId) {
             $record->ownerName = null;
             $record->ownerEmail = null;
         }
 
+        $record->snapshot = $license->snapshot;
         $record->userId = $license->userId;
 
         if (!$record->id) {
@@ -103,7 +103,10 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
                 $conflict = DigitalProducts_LicenseRecord::model()->findAllByAttributes(['licenseKey' => $licenseKey]);
             } while ($conflict);
 
-            $modifiedLicenseKey = craft()->plugins->callFirst('digitalProducts_modifyLicenseKeyForLicense', array($licenseKey, $license), true);
+            $modifiedLicenseKey = craft()->plugins->callFirst('digitalProducts_modifyLicenseKeyForLicense', [
+                $licenseKey,
+                $license
+            ], true);
 
             // Use the plugin-modified name, if anyone was up to the task.
             $licenseKey = $modifiedLicenseKey ?: $licenseKey;
@@ -142,7 +145,10 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         $transaction = craft()->db->getCurrentTransaction() === null ? craft()->db->beginTransaction() : null;
 
         try {
-            $event = new Event($this, ['license' => $license, 'isNewLicense' => !$license->id]);
+            $event = new Event($this, [
+                'license' => $license,
+                'isNewLicense' => !$license->id
+            ]);
             $this->onBeforeSaveLicense($event);
 
             $success = false;
@@ -150,7 +156,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
             if ($event->performAction) {
                 $success = craft()->elements->saveElement($license, false);
             }
-            
+
             if (!$success) {
                 if ($transaction !== null) {
                     $transaction->rollback();
@@ -168,7 +174,6 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
 
             $event = new Event($this, ['license' => $license]);
             $this->onSaveLicense($event);
-
         } catch (\Exception $e) {
             if ($transaction !== null) {
                 $transaction->rollback();
@@ -233,7 +238,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         }
 
         /**
-         * @var Commerce_OrderModel       $order
+         * @var Commerce_OrderModel $order
          * @var Commerce_TransactionModel $transaction
          */
         $transaction = $event->params['transaction'];
@@ -257,6 +262,39 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
                 $event->performAction = false;
 
                 return;
+            }
+        }
+    }
+
+    /**
+     * Suspend the License instead of deleting it if the Product licensed is being
+     * deleted, depending on the config setting.
+     *
+     * @param Event $event
+     */
+    public static function preserveLicensesForProduct($event)
+    {
+        if (empty($event->params['product'])) {
+            return;
+        }
+
+        /**
+         * @var DigitalProducts_ProductModel $product
+         */
+        $product = $event->params['product'];
+
+        $licenses = craft()->digitalProducts_licenses->getLicenses(['productId' => $product->id]);
+
+        foreach ($licenses as $license) {
+            // Delete or preserve in a "stasis", depending on the config
+            if (!craft()->config->get('preserveLicenseOnProductDelete', 'digitalProducts')) {
+                craft()->elements->deleteElementById($license->id);
+            } else {
+                $license->enabled = false;
+                $snapshot = $product->getSnapshot();
+                $snapshot['description'] = $product->getDescription();
+                $license->snapshot = $snapshot;
+                craft()->digitalProducts_licenses->saveLicense($license);
             }
         }
     }

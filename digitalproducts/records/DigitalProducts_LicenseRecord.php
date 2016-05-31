@@ -53,8 +53,20 @@ class DigitalProducts_LicenseRecord extends BaseRecord
             'product' => [
                 static::BELONGS_TO,
                 'DigitalProducts_ProductRecord',
-                'required' => true,
-                'onDelete' => static::CASCADE
+                'required' => false,
+                'onDelete' => static::SET_NULL
+            ],
+            'user' => [
+                static::BELONGS_TO,
+                'UserRecord',
+                'required' => false,
+                'onDelete' => static::SET_NULL
+            ],
+            'order' => [
+                static::BELONGS_TO,
+                'Commerce_OrderRecord',
+                'required' => false,
+                'onDelete' => static::SET_NULL
             ]
         ];
     }
@@ -74,8 +86,7 @@ class DigitalProducts_LicenseRecord extends BaseRecord
             'ownerName' => AttributeType::String,
             'ownerEmail' => [AttributeType::String],
             'enabled' => AttributeType::Bool,
-            'userId' => AttributeType::Number,
-            'orderId' => AttributeType::Number,
+            'snapshot' => [AttributeType::String, 'column' => ColumnType::Text]
         ];
     }
 }

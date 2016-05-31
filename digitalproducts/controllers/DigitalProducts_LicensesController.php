@@ -61,7 +61,18 @@ class DigitalProducts_LicensesController extends BaseController
     {
         $this->requirePostRequest();
 
-        $license = new DigitalProducts_LicenseModel();
+        $licenseId = craft()->request->getPost('licenseId');
+
+        if ($licenseId) {
+            $license = craft()->digitalProducts_licenses->getLicenseById($licenseId);
+
+            if (!$license) {
+                throw new Exception(Craft::t('No license with the ID “{id}”',
+                    ['id' => $licenseId]));
+            }
+        } else {
+            $license = new DigitalProducts_LicenseModel();
+        }
 
         $productIds = craft()->request->getPost('product');
         $userIds = craft()->request->getPost('owner');

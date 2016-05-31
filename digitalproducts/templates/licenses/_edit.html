@@ -14,18 +14,30 @@
 	{% if license.id %}<input type="hidden" name="licenseId" value="{{ license.id }}">{% endif %}
 
 	<div id="license-fields">
-		{{ forms.elementSelectField({
-			elementType: productElementType,
-			elements: license.productId ? craft.digitalProducts.products.id(license.productId).find() : null,
-			instructions: "The digital product that this license should be associated with"|t,
-			label: "Product"|t,
-			id: 'product',
-			errors: license.getErrors('productId'),
-			class: 'ltr',
-			name: 'product',
-			limit: 1
-		}) }}
+		{% if license.licenseKey and not license.productId %}
+			{% set productInput %}
+				<div class="input ltr">
+					<input class="text ltr fullwidth" type="text" disabled="disabled" value="{{ license.getProductName() }}" autocomplete="off" />
+				</div>
+			{% endset %}
 
+			{{ forms.field({
+				label: "Product"|t,
+				instructions: "A deleted digital product"|t
+			}, productInput) }}
+		{% else %}
+			{{ forms.elementSelectField({
+				elementType: productElementType,
+				elements: license.productId ? craft.digitalProducts.products.id(license.productId).find() : null,
+				instructions: "The digital product that this license should be associated with"|t,
+				label: "Product"|t,
+				id: 'product',
+				errors: license.getErrors('productId'),
+				class: 'ltr',
+				name: 'product',
+				limit: 1
+			}) }}
+		{% endif %}
 
 		{{ forms.textAreaField({
 			label: "License key"|t,

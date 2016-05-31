@@ -94,8 +94,7 @@ class DigitalProducts_LicenseModel extends BaseElementModel
             return $this->_order;
         }
 
-        if ($this->orderId)
-        {
+        if ($this->orderId) {
             return $this->_order = craft()->commerce_orders->getOrderById($this->orderId);
         }
 
@@ -123,7 +122,15 @@ class DigitalProducts_LicenseModel extends BaseElementModel
      */
     public function getProductName()
     {
-        return (string) $this->getProduct();
+        $product = $this->getProduct();
+        if (!$product) {
+            $snapshot = $this->getAttribute('snapshot');
+            if (empty($snapshot)) {
+                return false;
+            }
+            return (string) $snapshot['description'];
+        }
+        return (string)$product;
     }
 
     /**
@@ -161,16 +168,19 @@ class DigitalProducts_LicenseModel extends BaseElementModel
     {
         if ($handle == 'product') {
             $this->_product = isset($elements[0]) ? $elements[0] : null;
+
             return;
         }
 
         if ($handle == 'owner') {
             $this->_user = isset($elements[0]) ? $elements[0] : null;
+
             return;
         }
 
         if ($handle == 'order') {
             $this->_order = isset($elements[0]) ? $elements[0] : null;
+
             return;
         }
 
@@ -195,6 +205,7 @@ class DigitalProducts_LicenseModel extends BaseElementModel
             'ownerEmail' => AttributeType::String,
             'userId' => AttributeType::Number,
             'orderId' => AttributeType::Number,
+            'snapshot' => AttributeType::Mixed,
             'dateCreated' => AttributeType::DateTime,
             'dateUpdated' => AttributeType::DateTime,
         ]);

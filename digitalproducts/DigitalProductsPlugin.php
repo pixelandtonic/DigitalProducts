@@ -224,17 +224,26 @@ class DigitalProductsPlugin extends BasePlugin
      */
     private function _registerEventHandlers()
     {
-        craft()->on('commerce_orders.onOrderComplete', [
-            '\Craft\DigitalProducts_LicensesService',
-            'handleCompletedOrder'
-        ]);
+        // Craft User related event handlers
         craft()->on('users.onActivateUser', [
             '\Craft\DigitalProducts_LicensesService',
             'handleUserActivation'
         ]);
+
+        // Craft Commerce related event handlers
+        craft()->on('commerce_orders.onOrderComplete', [
+            '\Craft\DigitalProducts_LicensesService',
+            'handleCompletedOrder'
+        ]);
         craft()->on('commerce_payments.onBeforeGatewayRequestSend', [
             '\Craft\DigitalProducts_LicensesService',
             'maybePreventPayment'
+        ]);
+
+        // Digital Product related event handler
+        craft()->on('digitalProducts_products.onBeforeDeleteDigitalProduct', [
+            '\Craft\DigitalProducts_LicensesService',
+            'preserveLicensesForProduct'
         ]);
     }
 }

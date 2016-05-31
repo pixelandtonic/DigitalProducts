@@ -273,11 +273,11 @@ class DigitalProducts_LicenseElementType extends BaseElementType
     public function modifyElementsQuery(DbCommand $query, ElementCriteriaModel $criteria)
     {
         $query
-            ->addSelect("licenses.id, licenses.productId, licenses.licenseKey, licenses.ownerName, licenses.ownerEmail, licenses.userId, licenses.orderId, products.typeId as productTypeId")
+            ->addSelect("licenses.id, licenses.productId, licenses.licenseKey, licenses.ownerName, licenses.ownerEmail, licenses.userId, licenses.orderId, licenses.snapshot, products.typeId as productTypeId")
             ->join('digitalproducts_licenses licenses', 'licenses.id = elements.id')
-            ->join('digitalproducts_products products', 'products.id = licenses.productId')
+            ->leftJoin('digitalproducts_products products', 'products.id = licenses.productId')
             ->leftJoin('users users', 'users.id = licenses.userId')
-            ->join('digitalproducts_producttypes producttypes', 'producttypes.id = products.typeId');
+            ->leftJoin('digitalproducts_producttypes producttypes', 'producttypes.id = products.typeId');
 
         if ($criteria->email) {
             $query->andWhere([
