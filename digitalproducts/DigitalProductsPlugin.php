@@ -229,6 +229,10 @@ class DigitalProductsPlugin extends BasePlugin
             '\Craft\DigitalProducts_LicensesService',
             'handleUserActivation'
         ]);
+        craft()->on('users.onDeleteUser', [
+            '\Craft\DigitalProducts_LicensesService',
+            'handleUserDeletion'
+        ]);
 
         // Craft Commerce related event handlers
         craft()->on('commerce_orders.onOrderComplete', [
@@ -238,12 +242,6 @@ class DigitalProductsPlugin extends BasePlugin
         craft()->on('commerce_payments.onBeforeGatewayRequestSend', [
             '\Craft\DigitalProducts_LicensesService',
             'maybePreventPayment'
-        ]);
-
-        // Digital Product related event handler
-        craft()->on('digitalProducts_products.onBeforeDeleteDigitalProduct', [
-            '\Craft\DigitalProducts_LicensesService',
-            'preserveLicensesForProduct'
         ]);
     }
 }

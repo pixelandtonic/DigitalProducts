@@ -273,7 +273,7 @@ class DigitalProducts_LicenseElementType extends BaseElementType
     public function modifyElementsQuery(DbCommand $query, ElementCriteriaModel $criteria)
     {
         $query
-            ->addSelect("licenses.id, licenses.productId, licenses.licenseKey, licenses.ownerName, licenses.ownerEmail, licenses.userId, licenses.orderId, licenses.snapshot, products.typeId as productTypeId")
+            ->addSelect("licenses.id, licenses.productId, licenses.licenseKey, licenses.ownerName, licenses.ownerEmail, licenses.userId, licenses.orderId, products.typeId as productTypeId")
             ->join('digitalproducts_licenses licenses', 'licenses.id = elements.id')
             ->leftJoin('digitalproducts_products products', 'products.id = licenses.productId')
             ->leftJoin('users users', 'users.id = licenses.userId')
@@ -305,7 +305,7 @@ class DigitalProducts_LicenseElementType extends BaseElementType
         }
 
         if ($criteria->ownerId) {
-            $query->andWhere(DbHelper::parseParam('users.id', $criteria->ownerId, $query->params));
+            $query->andWhere(DbHelper::parseParam('licenses.userId', $criteria->ownerId, $query->params));
         }
 
         if ($criteria->product) {
@@ -318,7 +318,12 @@ class DigitalProducts_LicenseElementType extends BaseElementType
         }
 
         if ($criteria->productId) {
-            $query->andWhere(DbHelper::parseParam('products.id', $criteria->productId, $query->params));
+            if (!$criteria->productId == ':all:')
+            {
+                $query->andWhere(DbHelper::parseParam('products.id', $criteria->productId, $query->params));
+            }
+        } else {
+            $query->andWhere(DbHelper::parseParam('licenses.productId', ':notempty:', $query->params));
         }
 
         if ($criteria->type) {

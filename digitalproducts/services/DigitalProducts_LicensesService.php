@@ -66,7 +66,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
         $record->ownerName = $license->ownerName;
         $record->ownerEmail = $license->ownerEmail;
 
-        if (empty($license->productId) && empty($license->snapshot)) {
+        if (empty($license->productId)) {
             $license->addError('productId', Craft::t('{attribute} cannot be blank.', ['attribute' => 'Product']));
         }
 
@@ -94,7 +94,6 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
             $record->ownerEmail = null;
         }
 
-        $record->snapshot = $license->snapshot;
         $record->userId = $license->userId;
 
         if (!$record->id) {
@@ -267,39 +266,6 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
     }
 
     /**
-     * Suspend the License instead of deleting it if the Product licensed is being
-     * deleted, depending on the config setting.
-     *
-     * @param Event $event
-     */
-    public static function preserveLicensesForProduct($event)
-    {
-        if (empty($event->params['product'])) {
-            return;
-        }
-
-        /**
-         * @var DigitalProducts_ProductModel $product
-         */
-        $product = $event->params['product'];
-
-        $licenses = craft()->digitalProducts_licenses->getLicenses(['productId' => $product->id]);
-
-        foreach ($licenses as $license) {
-            // Delete or preserve in a "stasis", depending on the config
-            if (!craft()->config->get('preserveLicenseOnProductDelete', 'digitalProducts')) {
-                craft()->elements->deleteElementById($license->id);
-            } else {
-                $license->enabled = false;
-                $snapshot = $product->getSnapshot();
-                $snapshot['description'] = $product->getDescription();
-                $license->snapshot = $snapshot;
-                craft()->digitalProducts_licenses->saveLicense($license);
-            }
-        }
-    }
-
-    /**
      * If a user is activated and a license is assigned to the user's email,
      * assign it to the user if the config settings do not prevent that.
      *
@@ -331,6 +297,34 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
                 $license->userId = $user->id;
                 craft()->digitalProducts_licenses->saveLicense($license);
             }
+        }
+    }
+
+    /**
+     * If a user is deleted, transfer the licenses.
+     *
+     * @param Event $event
+     */
+    public static function handleUserDeletion(Event $event)
+    {
+        if (empty($event->params['user'])) {
+            return;
+        }
+
+        /**
+         * @var UserModel $user
+         */
+        $user = $event->params['user'];
+        $licenses = craft()->digitalProducts_licenses->getLicenses(['ownerId' => $user->id, 'productId' => ':all:']);
+
+        /**
+         * @var DigitalProducts_LicenseModel $license
+         */
+        foreach ($licenses as $license) {
+            // Transfer the user's licenses to the user's email.
+            $license->ownerEmail = $user->email;
+            $license->userId = null;
+            craft()->digitalProducts_licenses->saveLicense($license);
         }
     }
 

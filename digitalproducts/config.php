@@ -13,9 +13,6 @@ return [
     // Length of the generated license keys
     'licenseKeyLength' => 128,
 
-    // Should a license be disabled instead of being deleted when deleting a digital product
-    'preserveLicenseOnProductDelete' => true,
-
     // If a user *must* be logged in to complete a purchase with Digital Products in it.
     'requireLoggedInUser' => false,
 ];

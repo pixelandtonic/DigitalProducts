@@ -122,15 +122,7 @@ class DigitalProducts_LicenseModel extends BaseElementModel
      */
     public function getProductName()
     {
-        $product = $this->getProduct();
-        if (!$product) {
-            $snapshot = $this->getAttribute('snapshot');
-            if (empty($snapshot)) {
-                return false;
-            }
-            return (string) $snapshot['description'];
-        }
-        return (string)$product;
+        return (string)$this->getProduct();
     }
 
     /**
@@ -205,7 +197,6 @@ class DigitalProducts_LicenseModel extends BaseElementModel
             'ownerEmail' => AttributeType::String,
             'userId' => AttributeType::Number,
             'orderId' => AttributeType::Number,
-            'snapshot' => AttributeType::Mixed,
             'dateCreated' => AttributeType::DateTime,
             'dateUpdated' => AttributeType::DateTime,
         ]);
