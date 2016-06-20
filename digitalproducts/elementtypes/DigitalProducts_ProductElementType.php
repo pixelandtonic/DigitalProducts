@@ -99,7 +99,7 @@ class DigitalProducts_ProductElementType extends BaseElementType
             ]
         ];
 
-        $sources[] = ['heading' => Craft::t('Digital Product Types')];
+        $sources[] = ['heading' => Craft::t('Product Types')];
 
         foreach ($productTypes as $productType) {
             $key = 'productType:'.$productType->id;
@@ -508,7 +508,7 @@ class DigitalProducts_ProductElementType extends BaseElementType
                 );
             }
         }
-        
+
         return parent::getEagerLoadingMap($sourceElements, $handle);
     }
 }

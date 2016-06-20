@@ -58,7 +58,7 @@ class DigitalProducts_LicenseElementType extends BaseElementType
             ]
         ];
 
-        $sources[] = ['heading' => Craft::t('By Product Type')];
+        $sources[] = ['heading' => Craft::t('Product Types')];
 
         foreach ($productTypes as $productType) {
             $key = 'productType:'.$productType->id;
