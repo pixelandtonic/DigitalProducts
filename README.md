@@ -1,6 +1,6 @@
 # Digital Products plugin for Craft Commerce.
 
-This plugin provides digital product and their license management to the [Craft Commerce](http://craftcommerce.com) plugin.
+This plugin makes it possible to sell licenses to digital products with [Craft Commerce](http://craftcommerce.com).
 
 ## Requirements
 
@@ -12,36 +12,39 @@ To install Digital Plugins, copy the digitalproducts/ folder into craft/plugins/
 
 ## Configuration
 
-Digital Products has several configuration options that allow you to customize how the plugin behaves. To change the values, add `digitalproducts.php` into your site's `craft/config/` folder.
+Digital Products gets its own configuration file, located at `craft/config/digitalproducts.php`. It can have the following config settings:
 
-* `autoAssignLicensesOnUserRegistration` - If a user should be assigned all licenses that belong to the user's email address when creating the user. Defaults to `true`.
-* `autoAssignUserOnPurchase` - Should a user be assigned the license if a purchase is being made by a non-logged in user with the user's email address. Defaults to `false`.
-* `licenseKeyAlphabet` - The alphabet used for license keys. Defaults to alphanumeric characters.
-* `licenseKeyLength` - Length of the generated license keys. The default value is 128.
-* `requireLoggedInUser` - If a user *must* be logged in when completing a commerce order with at least one digital product.
+- **autoAssignLicensesOnUserRegistration** _(boolean)_ – Whether licenses should be automatically assigned to newly-registered users if the emails match. (Default is `true`.)
+- **autoAssignUserOnPurchase** _(boolean)_ – Whether license should automatically be assigned to existing users if the emails match. (Default is `false`.)
+- **licenseKeyCharacters** (string) – The available characters that can be used in license key generation. (Default is all alphanumeric ASCII characters.)
+- **licenseKeyLength** _(integer)_ – The length of generated license keys. (Default is `24`.)
+- **requireLoggedInUser** _(boolean)_ – Whether a user *must* be logged in when completing an order with at least one digital product in the cart. (Default is `false`.)
 
-## Hooks
+## Plugin Hooks
 
-Digital Products offers a few hooks to modify it's behaviour.
+Digital Products offers a few hooks that enable other plugins to modify its behavior:
 
-* `digitalProducts_modifyLicenseKeyForLicense` - Gives plugins a chance to modify the license key when it's being generated.
-* `digitalProducts_getProductTableAttributeHtml` - Gives plugins a chance to customize the HTML of the table cells on the digital product index page.
-* `digitalProducts_getLicenseTableAttributeHtml` - Gives plugins a chance to customize the HTML of the table cells on the license index page.
+- **digitalProducts_modifyLicenseKey** – Gives plugins a chance to modify a license key when it’s getting generated.
+
+- **digitalProducts_modifyProductSources** – Gives plugins a chance to modify
+the sources on digital product indexes.
+- **digitalProducts_defineAdditionalProductTableAttributes** – Gives plugins a chance to add additional available table attributes to digital product indexes.
+- **digitalProducts_getProductTableAttributeHtml** – Gives plugins a chance to override the HTML of the table cells on digital product indexes.
+- **digitalProducts_modifyProductSortableAttributes** – Gives plugins a chance to modify the array of sortable attributes on digital product indexes.
+
+- **digitalProducts_modifyLicenseSources** – Gives plugins a chance to modify
+the sources on license indexes.
+- **digitalProducts_defineAdditionalLicenseTableAttributes** – Gives plugins a chance to add additional available table attributes to license indexes.
+- **digitalProducts_getLicenseTableAttributeHtml** – Gives plugins a chance to override the HTML of the table cells on license indexes.
+- **digitalProducts_modifyLicenseSortableAttributes** – Gives plugins a chance to modify the array of sortable attributes on license indexes.
 
 ## Events
 
-Digital Products provides several events that alert other plugins.
+Digital Products offers a few events that other plugins can listen to:
 
-* `onBeforeSaveDigitalProduct` - Raised right before a digital product is saved. Event handlers can prevent the digital product from being saved by `$event->performAction` to false.
-* `onSaveDigitalProduct` - Raised when a digital product is saved.
-* `onBeforeDeleteDigitalProduct` - Raised right before a digital product is deleted. Event handlers can prevent the digital product from being saved by `$event->performAction` to false.
-* `onDeleteDigitalProduct` - Raised when a digital product is deleted.
-* `onBeforeSaveLicense` - Raised when a license is being saved. Event handlers can prevent the license from being saved by `$event->performAction` to false.
-* `onSaveLicense` - Raised when a license is saved.
-
-
-## Changelog
-
-### 1.0.0
-
-* Initial release
+- **digitalProducts_products.onBeforeSaveDigitalProduct** – Raised right before a digital product is saved. Passed with params `product` (the digital product) and `isNewProduct` (whether it’s new). Event handlers can prevent the digital product from being saved by setting `$event->performAction = false`.
+- **digitalProducts_products.onSaveDigitalProduct** – Raised after a digital product is saved. Passed with the param `product` (the digital product).
+- **digitalProducts_products.onBeforeDeleteDigitalProduct** – Raised right before a digital product is deleted. Passed with the param `product` (the digital product). Event handlers can prevent the digital product from being saved by setting `$event->performAction = false`.
+- **digitalProducts_products.onDeleteDigitalProduct** – Raised after a digital product is deleted. Passed with the param `product` (the digital product).
+- **digitalProducts_licenses.onBeforeSaveLicense** – Raised right before a license is being saved. Passed with params `license` (the license) and `isNewLicense` (whether it’s new). Event handlers can prevent the license from being saved by setting `$event->performAction = false`.
+- **onSaveLicense** – Raised after a license is saved. Passed with the param `license` (the license).

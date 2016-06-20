@@ -102,7 +102,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
                 $conflict = DigitalProducts_LicenseRecord::model()->findAllByAttributes(['licenseKey' => $licenseKey]);
             } while ($conflict);
 
-            $modifiedLicenseKey = craft()->plugins->callFirst('digitalProducts_modifyLicenseKeyForLicense', [
+            $modifiedLicenseKey = craft()->plugins->callFirst('digitalProducts_modifyLicenseKey', [
                 $licenseKey,
                 $license
             ], true);
@@ -370,7 +370,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
      */
     public function generateLicenseKey()
     {
-        $codeAlphabet = craft()->config->get('licenseKeyAlphabet', 'digitalProducts');
+        $codeAlphabet = craft()->config->get('licenseKeyCharacters', 'digitalProducts');
         $keyLength = craft()->config->get('licenseKeyLength', 'digitalProducts');
 
         $licenseKey = '';

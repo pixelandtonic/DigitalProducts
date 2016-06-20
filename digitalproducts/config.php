@@ -8,10 +8,10 @@ return [
     'autoAssignUserOnPurchase' => true,
 
     // The alphabet to use for license keys
-    'licenseKeyAlphabet' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+    'licenseKeyCharacters' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
 
     // Length of the generated license keys
-    'licenseKeyLength' => 128,
+    'licenseKeyLength' => 24,
 
     // If a user *must* be logged in to complete a purchase with Digital Products in it.
     'requireLoggedInUser' => false,
