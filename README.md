@@ -1,6 +1,6 @@
 # Digital Products plugin for Craft Commerce.
 
-This plugin makes it possible to sell licenses to digital products with [Craft Commerce](http://craftcommerce.com).
+This plugin makes it possible to sell licenses for digital products with [Craft Commerce](http://craftcommerce.com).
 
 ## Requirements
 
