@@ -8,7 +8,7 @@ Digital Products requires Craft CMS 2.6 or later and Craft Commerce 1.1 or later
 
 ## Installation
 
-To install Digital Plugins, copy the digitalproducts/ folder into craft/plugins/, and then go to Settings → Plugins and click the “Install” button next to “Digital Products”.
+To install Digital Products, copy the digitalproducts/ folder into craft/plugins/, and then go to Settings → Plugins and click the “Install” button next to “Digital Products”.
 
 ## Configuration
 
