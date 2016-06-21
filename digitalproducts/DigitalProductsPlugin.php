@@ -108,7 +108,7 @@ class DigitalProductsPlugin extends BasePlugin
      */
     public function getVersion()
     {
-        return '0.1';
+        return '1.0.0';
     }
 
     /**
@@ -118,7 +118,7 @@ class DigitalProductsPlugin extends BasePlugin
      */
     public function getSchemaVersion()
     {
-        return '0.0.1';
+        return '1.0.0';
     }
 
     /**
