@@ -8,89 +8,143 @@
 
 {% set statusOptions = [{label: 'Active'|t, value: 1}, {label: 'Disabled'|t, value: 0}] %}
 
-{% block content %}
+{% block main %}
 	<input type="hidden" name="action" value="digitalProducts/licenses/save">
 	<input type="hidden" name="redirect" value="digitalproducts/licenses">
 	{% if license.id %}<input type="hidden" name="licenseId" value="{{ license.id }}">{% endif %}
+	<div class="grid first" data-max-cols="3">
+		<div class="item" data-position="left" data-colspan="2">
+			<div id="fields" class="pane">
+				{% if license.licenseKey and not license.productId %}
+					{% set productInput %}
+						<div class="input ltr">
+							<input class="text ltr fullwidth" type="text" disabled="disabled" value="{{ license.getProductName() }}" autocomplete="off" />
+						</div>
+					{% endset %}
 
-	<div id="license-fields">
-		{% if license.licenseKey and not license.productId %}
-			{% set productInput %}
-				<div class="input ltr">
-					<input class="text ltr fullwidth" type="text" disabled="disabled" value="{{ license.getProductName() }}" autocomplete="off" />
-				</div>
-			{% endset %}
+					{{ forms.field({
+						label: "Product"|t,
+						instructions: "A deleted digital product"|t
+					}, productInput) }}
+				{% else %}
+					{{ forms.elementSelectField({
+						elementType: productElementType,
+						elements: license.productId ? craft.digitalProducts.products.id(license.productId).find() : null,
+						instructions: "The digital product that this license should be associated with"|t,
+						label: "Product"|t,
+						id: 'product',
+						errors: license.getErrors('productId'),
+						class: 'ltr',
+						name: 'product',
+						limit: 1
+					}) }}
+				{% endif %}
 
-			{{ forms.field({
-				label: "Product"|t,
-				instructions: "A deleted digital product"|t
-			}, productInput) }}
-		{% else %}
-			{{ forms.elementSelectField({
-				elementType: productElementType,
-				elements: license.productId ? craft.digitalProducts.products.id(license.productId).find() : null,
-				instructions: "The digital product that this license should be associated with"|t,
-				label: "Product"|t,
-				id: 'product',
-				errors: license.getErrors('productId'),
-				class: 'ltr',
-				name: 'product',
-				limit: 1
-			}) }}
-		{% endif %}
+				{{ forms.textAreaField({
+					label: "License key"|t,
+					instructions: "The license key is generated automatically"|t,
+					id: 'licenseKey',
+					class: 'code',
+					name: 'licenseKey',
+					disabled: true,
+					value: license.licenseKey,
+				}) }}
 
-		{{ forms.textAreaField({
-			label: "License key"|t,
-			instructions: "The license key is generated automatically"|t,
-			id: 'licenseKey',
-			class: 'code',
-			name: 'licenseKey',
-			disabled: true,
-			value: license.licenseKey,
-		}) }}
+				{{ forms.selectField({
+					label: "Status"|t,
+					id: 'status',
+					class: 'ltr',
+					name: 'enabled',
+					value: license.enabled,
+					options: statusOptions,
+					errors: license.getErrors('status')
+				}) }}
 
-		{{ forms.selectField({
-			label: "Status"|t,
-			id: 'status',
-			class: 'ltr',
-			name: 'enabled',
-			value: license.enabled,
-			options: statusOptions,
-			errors: license.getErrors('status')
-		}) }}
+				{{ forms.elementSelectField({
+					elementType: userElementType,
+					elements: license.userId ? craft.users.id(license.userId).find() : null,
+					label: "Owner"|t,
+					id: 'owner',
+					class: 'ltr',
+					name: 'owner',
+					limit: 1,
+					errors: license.getErrors('userId'),
+					required: true,
+					instructions: "Required, if Owner Email field is blank."|t
+				}) }}
 
-		{{ forms.elementSelectField({
-			elementType: userElementType,
-			elements: license.userId ? craft.users.id(license.userId).find() : null,
-			label: "Owner"|t,
-			id: 'owner',
-			class: 'ltr',
-			name: 'owner',
-			limit: 1,
-			errors: license.getErrors('userId'),
-			required: true,
-			instructions: "Required, if Owner Email field is blank."|t
-		}) }}
+				{{ forms.textField({
+					label: "Owner Name"|t,
+					id: 'ownerName',
+					class: 'ltr',
+					name: 'ownerName',
+					value: license.ownerName,
+					errors: license.getErrors('ownerName')
+				}) }}
 
-		{{ forms.textField({
-			label: "Owner Name"|t,
-			id: 'ownerName',
-			class: 'ltr',
-			name: 'ownerName',
-			value: license.ownerName,
-			errors: license.getErrors('ownerName')
-		}) }}
+				{{ forms.textField({
+					label: "Owner Email"|t,
+					id: 'ownerEmail',
+					class: 'ltr',
+					name: 'ownerEmail',
+					value: license.ownerEmail,
+					errors: license.getErrors('ownerEmail'),
+					required: true,
+					instructions: "Required, if Owner field is blank."|t,
+				}) }}
+			</div>
+		</div>
+		<div id="meta-pane" class="item" data-position="right">
+			<div class="pane meta">
+				{% set statusInput %}
+					<div class="left">
+						{{ forms.lightswitch({
+							id: 'enabled',
+							name: 'enabled',
+							on: license.enabled,
+							disabled: false
+						}) }}
+					</div>
 
-		{{ forms.textField({
-			label: "Owner Email"|t,
-			id: 'ownerEmail',
-			class: 'ltr',
-			name: 'ownerEmail',
-			value: license.ownerEmail,
-			errors: license.getErrors('ownerEmail'),
-			required: true,
-			instructions: "Required, if Owner field is blank."|t,
-		}) }}
+					{% if license.id %}
+						<div class="right">
+							<input type="button"
+								   class="btn small formsubmit"
+								   value="{{ 'Delete'|t }}"
+								   data-action="digitalProducts/licenses/delete"
+								   data-confirm="{{ 'Are you sure you want to delete this license?'|t }}"
+								   data-redirect="digitalproducts/licenses">
+						</div>
+					{% endif %}
+				{% endset %}
+
+				{{ forms.field({
+					id: 'enabled',
+					label: 'Enabled?'|t
+				}, statusInput) }}
+			</div>
+			<div class="pane meta">
+				{% if license.orderId %}
+					{% set productInput %}
+						<a href="{{ license.getOrderEditUrl() }}">View order no. {{ license.orderId }}</a>
+					{% endset %}
+				{% else %}
+					{% set productInput %}
+						No order associated with license.
+					{% endset %}
+				{% endif %}
+				{{ forms.field({
+					label: "Product order"|t
+				}, productInput) }}
+
+				{{ forms.dateTimeField({
+					label: 'License issue date'|t,
+					id: 'dateCreated',
+					name: 'dateCreated',
+					value: license.dateCreated,
+					disabled: true
+				}) }}
+			</div>
+		</div>
 	</div>
-
 {% endblock %}

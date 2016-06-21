@@ -62,7 +62,6 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
             }
         }
 
-        $record->enabled = $license->enabled;
         $record->ownerName = $license->ownerName;
         $record->ownerEmail = $license->ownerEmail;
 
@@ -352,8 +351,6 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
             $license->ownerEmail = $customer->email;
         }
 
-        $license->enabled = 1;
-
         $success = $this->saveLicense($license);
 
         if ($success) {
@@ -383,6 +380,28 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
     }
 
     /**
+     * Delete a License.
+     *
+     * @param DigitalProducts_LicenseModel $license
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function deleteLicense($license)
+    {
+        $event = new Event($this, ['license' => $license]);
+        $this->onBeforeDeleteLicense($event);
+
+        if ($event->performAction && craft()->elements->deleteElementById($license->id)) {
+            $event = new Event($this, ['license' => $license]);
+            $this->onDeleteLicense($event);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Event method
      *
      * @param Event $event
@@ -404,5 +423,29 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
     public function onSaveLicense(Event $event)
     {
         $this->raiseEvent('onSaveLicense', $event);
+    }
+
+    /**
+     * Event method
+     *
+     * @param Event $event
+     *
+     * @throws \CException
+     */
+    public function onBeforeDeleteLicense(Event $event)
+    {
+        $this->raiseEvent('onBeforeDeleteLicense', $event);
+    }
+
+    /**
+     * Event method
+     *
+     * @param Event $event
+     *
+     * @throws \CException
+     */
+    public function onDeleteLicense(Event $event)
+    {
+        $this->raiseEvent('onDeleteLicense', $event);
     }
 }

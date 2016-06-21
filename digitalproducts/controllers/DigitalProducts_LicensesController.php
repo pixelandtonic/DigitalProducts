@@ -110,15 +110,26 @@ class DigitalProducts_LicensesController extends BaseController
     public function actionDelete()
     {
         $this->requirePostRequest();
-        $this->requireAjaxRequest();
 
-        $id = craft()->request->getRequiredPost('id');
+        $id = craft()->request->getRequiredPost('licenseId');
+        $license = craft()->digitalProducts_licenses->getLicenseById($id);
+        if(!$license){
+            throw new HttpException(404);
+        }
 
-        try {
-            craft()->digitalProducts_Licenses->deleteLicenseById($id);
-            $this->returnJson(['success' => true]);
-        } catch (\Exception $e) {
-            $this->returnErrorJson($e->getMessage());
+        if (craft()->digitalProducts_licenses->deleteLicense($license)) {
+            if (craft()->request->isAjaxRequest()) {
+                $this->returnJson(['success' => true]);
+            } else {
+                craft()->userSession->setNotice(Craft::t('License deleted.'));
+                $this->redirectToPostedUrl($license);
+            }
+        } else {
+            if (craft()->request->isAjaxRequest()) {
+                $this->returnJson(['success' => false]);
+            } else {
+                craft()->userSession->setError(Craft::t('Couldn’t delete license.'));
+            }
         }
     }
 

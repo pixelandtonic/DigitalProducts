@@ -79,8 +79,7 @@ class DigitalProducts_LicenseRecord extends BaseRecord
             'licenseKey' => [AttributeType::String, 'required' => true],
             'ownerName' => AttributeType::String,
             'ownerEmail' => [AttributeType::String],
-            'userId' => AttributeType::Number,
-            'enabled' => AttributeType::Bool,
+            'userId' => AttributeType::Number
         ];
     }
 }
