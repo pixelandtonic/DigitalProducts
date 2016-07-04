@@ -174,7 +174,7 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
             $this->_isLicensed = false;
             $user = craft()->userSession->getUser();
             if ($user) {
-                $criteria = ['owner' => $user, 'product' => $this];
+                $criteria = ['owner' => $user, 'product' => $this, 'status' => 'enabled'];
                 $license = craft()->elements->getCriteria("DigitalProducts_License", $criteria)->first();
 
                 if ($license) {
@@ -195,8 +195,7 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     public function setEagerLoadedElements($handle, $elements)
     {
         if ($handle == 'isLicensed') {
-            $this->_isLicensed = isset($elements[0]) ? true : false;
-            return;
+            return $this->getIsLicensed();
         }
 
         parent::setEagerLoadedElements($handle, $elements);
