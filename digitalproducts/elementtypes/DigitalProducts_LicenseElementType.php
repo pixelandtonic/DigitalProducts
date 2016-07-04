@@ -194,7 +194,7 @@ class DigitalProducts_LicenseElementType extends BaseElementType
         $attributes = [
             'slug' => Craft::t('Product name'),
             'licensedTo' => Craft::t('Owner'),
-            'dateCreated' => Craft::t('License issue date'),
+            'licenseDate' => Craft::t('License date'),
         ];
 
         // Allow plugins to modify the attributes
