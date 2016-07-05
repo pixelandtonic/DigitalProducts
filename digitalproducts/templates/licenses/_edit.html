@@ -49,17 +49,7 @@
 					disabled: true,
 					value: license.licenseKey,
 				}) }}
-
-				{{ forms.selectField({
-					label: "Status"|t,
-					id: 'status',
-					class: 'ltr',
-					name: 'enabled',
-					value: license.enabled,
-					options: statusOptions,
-					errors: license.getErrors('status')
-				}) }}
-
+				
 				{{ forms.elementSelectField({
 					elementType: userElementType,
 					elements: license.userId ? craft.users.id(license.userId).find() : null,
