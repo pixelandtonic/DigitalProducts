@@ -233,7 +233,7 @@ class DigitalProducts_LicenseElementType extends BaseElementType
 
             'status' => [
                 AttributeType::String,
-                'default' => DigitalProducts_ProductModel::LIVE
+                'default' => BaseElementModel::ENABLED
             ],
 
             'order' => [AttributeType::String, 'default' => 'dateCreated desc'],
