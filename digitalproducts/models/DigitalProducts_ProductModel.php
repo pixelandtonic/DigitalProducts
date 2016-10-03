@@ -164,6 +164,16 @@ class DigitalProducts_ProductModel extends BaseElementModel implements Purchasab
     }
 
     /**
+     * Returns the product's product type model. Alias of ::getProductType()
+     *
+     * @return DigitalProducts_ProductTypeModel
+     */
+    public function getType()
+    {
+        return $this->getProductType();
+    }
+
+    /**
      * Return true if the current user has a license for this product.
      *
      * @return bool
