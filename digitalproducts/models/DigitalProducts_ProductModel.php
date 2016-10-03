@@ -1,7 +1,7 @@
 <?php
 namespace Craft;
 
-use Commerce\Interfaces\Purchasable;
+use Commerce\Base\Purchasable as BasePurchasable;
 
 /**
  * Product model.
@@ -9,7 +9,7 @@ use Commerce\Interfaces\Purchasable;
  * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @copyright Copyright (c) 2016, Pixel & Tonic, Inc.
  */
-class DigitalProducts_ProductModel extends BaseElementModel implements Purchasable
+class DigitalProducts_ProductModel extends BasePurchasable
 {
 
     const LIVE = 'live';
