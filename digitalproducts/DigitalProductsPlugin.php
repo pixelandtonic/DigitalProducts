@@ -62,23 +62,39 @@ class DigitalProductsPlugin extends BasePlugin
     }
 
     /**
-     * Commerce Developer URL.
+     * Digital Products developer URL.
      *
      * @return string
      */
     public function getDeveloperUrl()
     {
-        return 'https://craftcommerce.com';
+        return 'https://pixelandtonic.com.com';
     }
 
     /**
-     * Commerce Documentation URL.
+     * @return string
+     */
+    public function getPluginUrl()
+    {
+        return 'https://github.com/pixelandtonic/DigitalProducts';
+    }
+
+    /**
+     * Digital Products documentation URL.
      *
      * @return string
      */
     public function getDocumentationUrl()
     {
-        return;
+        return $this->getPluginUrl().'/blob/master/README.md';;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReleaseFeedUrl()
+    {
+        return 'https://raw.githubusercontent.com/pixelandtonic/DigitalProducts/master/releases.json';
     }
 
     /**
@@ -102,17 +118,16 @@ class DigitalProductsPlugin extends BasePlugin
     }
 
     /**
-     * Commerce Version.
-     *
+     * Digital Products version.
      * @return string
      */
     public function getVersion()
     {
-        return '1.0.2';
+        return '1.0.3';
     }
 
     /**
-     * Commerce Schema Version.
+     * Digital Products schema version.
      *
      * @return string|null
      */

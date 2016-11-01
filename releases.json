@@ -1,0 +1,10 @@
+[
+  {
+    version: "1.0.3",
+    downloadUrl: "https://github.com/pixelandtonic/DigitalProducts/archive/1.0.3.zip",
+    date: "2016-11-01T15:00:00-08:00",
+    notes: [
+      "[Added] Added support for a plugin release feed to new releases going forward will be on the Craft updates page."
+    ]
+  }
+]

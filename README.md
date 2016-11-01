@@ -133,3 +133,20 @@ Both licenses and products have several eager-loadable properties
     {% endif %}
 ```
 
+## Changelog
+
+### 1.0.3
+
+* Added support for a plugin release feed.
+
+### 1.0.2
+
+* Fixed bugs.
+
+### 1.0.1
+
+* Fixed bugs.
+
+### 1.0.0
+
+* Initial release
