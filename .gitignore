@@ -1,1 +1,4 @@
-.DS_Store
+*.idea/*
+*.log
+*.DS_Store
+*Thumbs.db
