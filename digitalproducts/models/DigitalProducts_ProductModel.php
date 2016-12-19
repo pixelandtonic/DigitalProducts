@@ -71,6 +71,22 @@ class DigitalProducts_ProductModel extends BasePurchasable
     }
 
     /**
+     * Gets the product type
+     *
+     * @return DigitalProducts_ProductTypeModel
+     */
+    public function getType()
+    {
+        if ($this->typeId)
+        {
+            return craft()->digitalProducts_productTypes->getProductTypeById($this->typeId);
+        }
+    }
+
+    /**
+
+
+    /**
      * @inheritdoc BaseElementModel::isEditable()
      *
      * @return bool
