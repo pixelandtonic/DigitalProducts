@@ -135,6 +135,10 @@ Both licenses and products have several eager-loadable properties
 
 ## Changelog
 
+### 1.0.4
+
+* Fixed a bug where digital product prices did not display correctly.
+
 ### 1.0.3
 
 * Added support for a plugin release feed.
