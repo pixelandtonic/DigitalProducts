@@ -93,7 +93,7 @@
 		name: 'price',
 		value: (product.price == '0' ? '0'|number : (product.price ?  product.price|number ?: '')),
 		placeholder: 'Enter price'|t,
-		unit: craft.commerce.settings.defaultCurrency,
+		unit: craft.commerce.primaryPaymentCurrency.iso,
 		required: true,
 		errors: product.getErrors('price')
 	}) }}
