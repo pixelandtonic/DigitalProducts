@@ -1,5 +1,13 @@
 [
   {
+    version: "1.0.4",
+    downloadUrl: "https://github.com/pixelandtonic/DigitalProducts/archive/1.0.4.zip",
+    date: "2017-04-01T15:00:00-08:00",
+    notes: [
+      "[Added] Fixed the display of prices in the default payment currency."
+    ]
+  }
+  {
     version: "1.0.3",
     downloadUrl: "https://github.com/pixelandtonic/DigitalProducts/archive/1.0.3.zip",
     date: "2016-11-01T15:00:00-08:00",
