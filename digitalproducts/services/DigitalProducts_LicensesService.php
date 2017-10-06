@@ -348,7 +348,7 @@ class DigitalProducts_LicensesService extends BaseApplicationComponent
             $license->ownerName = $user->getName();
             $license->userId = $user->id;
         } else {
-            $license->ownerEmail = $customer->email;
+            $license->ownerEmail = $order->email;
         }
 
         $success = $this->saveLicense($license);
