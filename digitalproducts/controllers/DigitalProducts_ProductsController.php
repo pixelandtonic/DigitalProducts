@@ -402,7 +402,7 @@ class DigitalProducts_ProductsController extends BaseController
             $product->enabled = $data['enabled'];
         }
 
-        $product->price = (float)$data['price'];
+        $product->price = LocalizationHelper::normalizeNumber($data['price']);
         $product->sku = $data['sku'];
 
         $product->postDate = $data['postDate'] ? \Craft\DateTime::createFromString($data['postDate'], \Craft\craft()->timezone) : $product->postDate;

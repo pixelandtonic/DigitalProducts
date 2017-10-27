@@ -135,6 +135,10 @@ Both licenses and products have several eager-loadable properties
 
 ## Changelog
 
+### 1.0.5
+
+* Fixed a bug where digital product prices would sometimes not be saved correctly.
+
 ### 1.0.4
 
 * Fixed a bug where digital product prices did not display correctly.
