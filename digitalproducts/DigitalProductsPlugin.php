@@ -68,7 +68,7 @@ class DigitalProductsPlugin extends BasePlugin
      */
     public function getDeveloperUrl()
     {
-        return 'https://pixelandtonic.com.com';
+        return 'https://pixelandtonic.com';
     }
 
     /**
